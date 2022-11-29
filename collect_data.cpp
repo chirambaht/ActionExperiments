@@ -189,10 +189,13 @@ void loop() {
 	if( timestart > 10000 && !state )
 		digitalWrite( LED_GREEN, HIGH );
 
+#ifndef HARDWARE_INTERRUPT
 	// If state is true, start recording
 	if( state ) {
+		// Collecting data here with no interrupt
 		_get_dmp_data();
 	}
+#endif
 
 	gettimeofday( &endc, NULL );
 	seconds	 = endc.tv_sec - startc.tv_sec;
