@@ -25,7 +25,7 @@ MPU6050 mpu;
 #define OUTPUT_READABLE_QUATERNION
 //#define OUTPUT_READABLE_EULER
 //#define OUTPUT_READABLE_YAWPITCHROLL
-#define OUTPUT_READABLE_REALACCEL
+// #define OUTPUT_READABLE_REALACCEL
 //#define OUTPUT_READABLE_WORLDACCEL
 
 // MPU control/status vars
@@ -147,7 +147,7 @@ void loop() {
   useconds = end.tv_usec - start.tv_usec;
   timestart = ((seconds)*1000 + useconds / 1000.0) + 0.5;
 
-  if (timestart > 25000)
+  if (timestart > 10000)
     digitalWrite(LED_GREEN, HIGH);
 
   if (digitalRead(BUTTON) == true && timestart > 25000) {
@@ -229,8 +229,8 @@ void loop() {
       // arq_YawPitchRoll = fopen(Data_YawPitchRoll.c_str(),"wt");
       // fprintf(arq_YawPitchRoll,"time,yaw,pitch,roll\n");
 
-      arq_LinearAcc = fopen(Data_LinearAcc.c_str(), "wt");
-      fprintf(arq_LinearAcc, "time,accx,accy,accz\n");
+      //   arq_LinearAcc = fopen(Data_LinearAcc.c_str(), "wt");
+      //   fprintf(arq_LinearAcc, "time,accx,accy,accz\n");
 
       // arq_WorldAcc = fopen(Data_WorldAcc.c_str(),"wt");
       // fprintf(arq_WorldAcc,"time,accx,accy,accz\n");
@@ -355,8 +355,8 @@ void loop() {
       // 180/M_PI, euler[1] * 180/M_PI, euler[2] * 180/M_PI);
       // fprintf(arq_YawPitchRoll,"%ld,%7.2f,%7.2f,%7.2f\n",mtime, ypr[0] *
       // 180/M_PI, ypr[1] * 180/M_PI, ypr[2] * 180/M_PI);
-      fprintf(arq_LinearAcc, "%ld,%6d,%6d,%6d\n", mtime, accReal.x, accReal.y,
-              accReal.z);
+      //   fprintf(arq_LinearAcc, "%ld,%6d,%6d,%6d\n", mtime, accReal.x,
+      //   accReal.y, accReal.z);
       // fprintf(arq_WorldAcc,"%ld,%6d,%6d,%6d\n",
       // mtime,accWorld.x,accWorld.y,accWorld.z);
     }
