@@ -83,9 +83,9 @@ void _get_dmp_data() {
 
 	mpu.getFIFOBytes( fifoBuffer, packetSize );
 
-	printf( "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
-	printf( "%ld,%6d,%6d,%6d\n", mtime, gyr.x, gyr.y, gyr.z );
-	printf( "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
+	printf( "%ld, %7d, %7d, %7d\n", mtime, acc.x, acc.y, acc.z );
+	printf( "%ld, %7d, %7d, %7d\n", mtime, gyr.x, gyr.y, gyr.z );
+	printf( "%ld, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, q.w, q.x, q.y, q.z );
 	return;
 }
 
