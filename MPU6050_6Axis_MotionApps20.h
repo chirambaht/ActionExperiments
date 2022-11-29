@@ -55,7 +55,9 @@ THE SOFTWARE.
 // Teensy 3.0 library conditional PROGMEM code from Paul Stoffregen
 #ifndef __PGMSPACE_H_
 #define __PGMSPACE_H_ 1
+#include <cstring>
 #include <inttypes.h>
+#include <unistd.h>
 
 #define PROGMEM
 #define PGM_P const char *
