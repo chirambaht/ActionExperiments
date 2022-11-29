@@ -65,6 +65,7 @@ long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
 // ================================================================
 
 void _get_dmp_data( void ) {
+	printf( "get dmp data\n" );
 	if( state ) {
 		return;
 	}
@@ -91,6 +92,7 @@ void _get_dmp_data( void ) {
 
 void buttonPressed( void ) {
 	// debounce the button
+	printf( "Button pressed\n" );
 	if( millis() - press_time < 1000 ) {
 		return;
 	}
@@ -102,7 +104,6 @@ void buttonPressed( void ) {
 	} else {
 		state = 1;
 	}
-	printf( "Button pressed\n" );
 }
 
 void setup() {
