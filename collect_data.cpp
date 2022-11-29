@@ -72,13 +72,13 @@ void _get_dmp_data() {
 		return;
 	}
 
-	_fifo_count = _device->getFIFOCount();
+	fifoCount = mpu.getFIFOCount();
 
-	if( _fifo_count < packetSize ) {
+	if( fifoCount < packetSize ) {
 		return;
 	}
 
-	_device->getFIFOBytes( fifoBuffer, packetSize );
+	mpu.getFIFOBytes( fifoBuffer, packetSize );
 
 	printf( "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
 	printf( "%ld,%6d,%6d,%6d\n", mtime, gyr.x, gyr.y, gyr.z );
