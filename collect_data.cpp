@@ -177,8 +177,16 @@ void loop() {
     } else {
       digitalWrite(LED_RED, LOW);
       DIR *d;
+
+      std::string data_folder = "Data";
+      // if Data folder doesn't exist, create it
+
+      if (opendir(data_folder.c_str()) == NULL) {
+        mkdir(data_folder.c_str(), 0777);
+      }
+
       struct dirent *dir;
-      d = opendir("/home/pi/MPU6050-Pi-Demo/Datas");
+      d = opendir("Data");
       int dir_len = 0;
       if (d != NULL) {
         while ((dir = readdir(d)) != NULL)
@@ -189,8 +197,7 @@ void loop() {
       }
 
       printf("%d", dir_len);
-      namepaste =
-          "/home/pi/MPU6050-Pi-Demo/Datas/data_" + std::to_string(dir_len - 2);
+      namepaste = data_folder + std::to_string(dir_len - 2);
       printf(namepaste.c_str());
 
       std::string new_dir = namepaste;
