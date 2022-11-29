@@ -91,7 +91,7 @@ void _get_dmp_data( void ) {
 void buttonPressed( void ) {
 	// debounce the button
 
-	if( millis() - press_time < 1000 ) {
+	if( millis() - press_time < 300 ) {
 		return;
 	}
 
@@ -99,10 +99,10 @@ void buttonPressed( void ) {
 
 	if( state ) {
 		state = false;
-		digitalWrite( LED_GREEN, HIGH );
+		digitalWrite( LED_RED, HIGH );
 	} else {
 		state = true;
-		digitalWrite( LED_GREEN, LOW );
+		digitalWrite( LED_RED, LOW );
 	}
 	printf( "State changed to %d\n", state );
 }
@@ -186,7 +186,7 @@ void loop() {
 	useconds  = end.tv_usec - start.tv_usec;
 	timestart = ( ( seconds ) *1000 + useconds / 1000.0 ) + 0.5;
 
-	if( timestart > 10000 )
+	if( timestart > 10000 && !state )
 		digitalWrite( LED_GREEN, HIGH );
 
 	// If state is true, start recording
