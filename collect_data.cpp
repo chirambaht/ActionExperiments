@@ -17,7 +17,7 @@
 
 #define LED_GREEN	  29
 #define LED_RED		  25
-#define BUTTON		  7
+#define BUTTON		  0
 #define INTERRUPT_PIN 27
 
 MPU6050 mpu;
