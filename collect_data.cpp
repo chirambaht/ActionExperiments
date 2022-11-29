@@ -49,9 +49,8 @@ VectorFloat gravity;  // [x, y, z]            gravity vector
 float		euler[3]; // [psi, theta, phi]    Euler angle container
 float		ypr[3];	  // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 int			press_time = 0;
-bool		state	   = 0;
+bool		state	   = false;
 // packet structure for InvenSense teapot demo
-uint8_t teapotPacket[14] = { '$', 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x00, '\r', '\n' };
 
 FILE *arq_Accel, *arq_Gyro, *arq_Quaternions, *arq_Euler, *arq_YawPitchRoll, *arq_LinearAcc, *arq_WorldAcc;
 
@@ -65,14 +64,13 @@ long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
 // ================================================================
 
 void _get_dmp_data( void ) {
-	printf( "get dmp data\n" );
-	if( state ) {
+	if( !state ) {
 		return;
 	}
-	uint8_t _device_interrupt_status = mpu.getIntStatus();
+	mpuIntStatus = mpu.getIntStatus();
 
 	// does the FIFO have data in it?
-	if( ( _device_interrupt_status & 0x02 ) < 1 ) {
+	if( ( mpuIntStatus & 0x02 ) < 1 ) {
 		return;
 	}
 
@@ -92,7 +90,7 @@ void _get_dmp_data( void ) {
 
 void buttonPressed( void ) {
 	// debounce the button
-	printf( "Button pressed\n" );
+
 	if( millis() - press_time < 1000 ) {
 		return;
 	}
@@ -100,10 +98,13 @@ void buttonPressed( void ) {
 	press_time = millis();
 
 	if( state ) {
-		state = 0;
+		state = false;
+		digitalWrite( LED_GREEN, HIGH );
 	} else {
-		state = 1;
+		state = true;
+		digitalWrite( LED_GREEN, LOW );
 	}
+	printf( "State changed to %d\n", state );
 }
 
 void setup() {
@@ -148,10 +149,10 @@ void setup() {
 		printf( "Enabling DMP...\n" );
 		mpu.setDMPEnabled( true );
 
-		// enable Interrupt on WiringPi
-		if( wiringPiISR( INTERRUPT_PIN, INT_EDGE_RISING, &_get_dmp_data ) < 0 ) {
-			printf( "Error setting up DMP interrupt\n" );
-		}
+		// enable hardware Interrupt on WiringPi
+		// if( wiringPiISR( INTERRUPT_PIN, INT_EDGE_RISING, &_get_dmp_data ) < 0 ) {
+		// 	printf( "Error setting up DMP interrupt\n" );
+		// }
 
 		mpuIntStatus = mpu.getIntStatus();
 
@@ -185,114 +186,19 @@ void loop() {
 	useconds  = end.tv_usec - start.tv_usec;
 	timestart = ( ( seconds ) *1000 + useconds / 1000.0 ) + 0.5;
 
-	if( timestart > 5000 )
+	if( timestart > 10000 )
 		digitalWrite( LED_GREEN, HIGH );
 
-	if( digitalRead( BUTTON ) == true && timestart > 25000 ) {
-		gettimeofday( &startb, NULL );
-
-		while( digitalRead( BUTTON ) ) {
-			gettimeofday( &endb, NULL );
-			secondsb   = endb.tv_sec - startb.tv_sec;
-			usecondsb  = endb.tv_usec - startb.tv_usec;
-			timestartb = ( ( secondsb ) *1000 + usecondsb / 1000.0 ) + 0.5;
-		}
-
-		if( state ) {
-			fclose( arq_Accel );
-			fclose( arq_Gyro );
-			fclose( arq_Quaternions );
-
-			digitalWrite( LED_RED, HIGH );
-		} else {
-			digitalWrite( LED_RED, LOW );
-
-			DIR *d;
-
-			std::string data_folder = "Data"; // if Data folder doesn't exist, create it
-
-			if( opendir( data_folder.c_str() ) == NULL ) {
-				mkdir( data_folder.c_str(), 0777 );
-			}
-
-			struct dirent *dir;
-			d			= opendir( data_folder.c_str() );
-			int dir_len = 0;
-			if( d != NULL ) {
-				while( ( dir = readdir( d ) ) != NULL )
-					dir_len++;
-				( void ) closedir( d );
-				printf( "Directory opened. Number of files: %d\n", dir_len );
-			} else {
-				perror( "Couldn't open the directory" );
-			}
-
-			printf( "%d", dir_len );
-			namepaste = data_folder + std::to_string( dir_len - 2 );
-			printf( namepaste.c_str() );
-
-			std::string new_dir		 = namepaste;
-			std::string existing_dir = ".";
-			struct stat atributes;
-			stat( existing_dir.c_str(), &atributes );
-			mkdir( new_dir.c_str(), atributes.st_mode );
-
-			std::string Data_Accel = namepaste + "/Data_Accel.txt", Data_Gyro = namepaste + "/Data_Gyro.txt",
-						Data_Quaternions = namepaste + "/Data_Quaternions.txt";
-
-			arq_Accel = fopen( Data_Accel.c_str(), "wt" );
-			fprintf( arq_Accel, "time,accx,accy,accz\n" );
-
-			arq_Gyro = fopen( Data_Gyro.c_str(), "wt" );
-			fprintf( arq_Gyro, "time,gyrx,gyry,gyrz\n" );
-
-			arq_Quaternions = fopen( Data_Quaternions.c_str(), "wt" );
-			fprintf( arq_Quaternions, "time,qw,qx,qy,qz\n" );
-
-			gettimeofday( &startc, NULL );
-		}
-		state = !state;
-		printf( "Change state " );
-		printf( "%d\n", state );
+	// If state is true, start recording
+	if( state ) {
+		_get_dmp_data();
 	}
-	// if programming failed, don't try to do anything
-	// if( !dmpReady )
-	// 	return;
-	// // get current FIFO count
-	// fifoCount = mpu.getFIFOCount();
 
-	// if( fifoCount == 1024 ) {
-	// 	// reset so we can continue cleanly
-	// 	mpu.resetFIFO();
-	// 	printf( "FIFO overflow!\n" );
-
-	// 	// otherwise, check for DMP data ready interrupt (this should happen
-	// 	// frequently)
-	// } else if( fifoCount >= 42 ) {
-	// 	if( state )
-	// 		digitalWrite( LED_GREEN, LOW );
-
-	// 	// read a packet from FIFO
-	// 	mpu.getFIFOBytes( fifoBuffer, packetSize );
-
-	// 	// get the time to create the millis function
 	gettimeofday( &endc, NULL );
 	seconds	 = endc.tv_sec - startc.tv_sec;
 	useconds = endc.tv_usec - startc.tv_usec;
 
 	mtime = ( ( seconds ) *1000 + useconds / 1000.0 ) + 0.5; // current time in ms
-															 // 	// display time in milliseconds
-
-	// 	// Start of the processing block
-	// 	// End of the processing block
-
-	// 	printf( "\n" );
-	// 	if( state ) {
-	// 		fprintf( arq_Accel, "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
-	// 		fprintf( arq_Gyro, "%ld,%6d,%6d,%6d\n", mtime, gyr.x, gyr.y, gyr.z );
-	// 		fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
-	// 	}
-	// }
 }
 
 int main() {
