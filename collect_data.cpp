@@ -151,7 +151,9 @@ void setup() {
 		mpu.setDMPEnabled( true );
 
 		// enable Interrupt on WiringPi
-		wiringPiISR( INTERRUPT_PIN, INT_EDGE_RISING, &_get_dmp_data );
+		if( wiringPiISR( INTERRUPT_PIN, INT_EDGE_RISING, &_get_dmp_data ) < 1 ) {
+			printf( "Error setting up DMP interrupt\n" );
+		}
 
 		mpuIntStatus = mpu.getIntStatus();
 
