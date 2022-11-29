@@ -283,10 +283,11 @@ void loop() {
 #ifdef OUTPUT_READABLE_QUATERNION
     // display quaternion values in easy matrix form: w x y z
     mpu.dmpGetQuaternion(&q, fifoBuffer);
-    // printf("quat %7.5f %7.5f %7.5f %7.5f    ", q.w,q.x,q.y,q.z);
+    printf("quat %7.5f %7.5f %7.5f %7.5f    ", q.w, q.x, q.y, q.z);
     //  save quaternion values
-    fprintf(arq_Quaternions, "%ld,%7.2f,%7.2f,%7.2f,%7.2f\n", mtime, q.w, q.x,
-            q.y, q.z);
+    // fprintf(arq_Quaternions, "%ld,%7.2f,%7.2f,%7.2f,%7.2f\n", mtime, q.w,
+    // q.x,
+    //         q.y, q.z);
 #endif
 
 #ifdef OUTPUT_READABLE_EULER
