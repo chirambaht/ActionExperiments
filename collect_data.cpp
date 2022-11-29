@@ -48,8 +48,8 @@ VectorInt16 accWorld; // [x, y, z]            world-frame accel sensor measureme
 VectorFloat gravity;  // [x, y, z]            gravity vector
 float		euler[3]; // [psi, theta, phi]    Euler angle container
 float		ypr[3];	  // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
-
-bool state = 0;
+int			press_time = 0;
+bool		state	   = 0;
 // packet structure for InvenSense teapot demo
 uint8_t teapotPacket[14] = { '$', 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x00, '\r', '\n' };
 
@@ -89,6 +89,22 @@ void _get_dmp_data() {
 	return;
 }
 
+void buttonPressed() {
+	// debounce the button
+	if( millis() - press_time < 1000 ) {
+		return;
+	}
+
+	press_time = millis();
+
+	if( state ) {
+		state = 0;
+	} else {
+		state = 1;
+	}
+	printf( "Button pressed\n" );
+}
+
 void setup() {
 	// initialize device
 	printf( "Initializing I2C devices...\n" );
@@ -100,6 +116,9 @@ void setup() {
 	pinMode( LED_GREEN, OUTPUT );
 	pinMode( BUTTON, INPUT );
 
+	// interrupt for the button
+	wiringPiISR( BUTTON, INT_EDGE_RISING, &buttonPressed );
+
 	digitalWrite( LED_RED, HIGH );
 	digitalWrite( LED_GREEN, LOW );
 
@@ -109,6 +128,9 @@ void setup() {
 
 	// load and configure the DMP
 	printf( "Initializing DMP...\n" );
+
+	while( digitalRead( BUTTON ) == 1 ) {
+	}
 
 	devStatus = mpu.dmpInitialize();
 
@@ -273,7 +295,6 @@ void loop() {
 
 int main() {
 	setup();
-	// usleep(100000);
 	while( 1 ) {
 		loop();
 	}
