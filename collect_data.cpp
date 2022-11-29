@@ -3,6 +3,7 @@
 
 #include <dirent.h>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <math.h>
 #include <stdint.h>
@@ -52,9 +53,8 @@ int			press_time = 0;
 bool		state	   = false;
 // packet structure for InvenSense teapot demo
 
-FILE *arq_Accel, *arq_Gyro, *arq_Quaternions, *arq_Euler, *arq_YawPitchRoll, *arq_LinearAcc, *arq_WorldAcc;
-
-std::string namepaste = "";
+FILE	   *output_file;
+std::string file_name = "data.csv";
 
 struct timeval start, end, startc, endc, startb, endb;
 long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
@@ -82,10 +82,24 @@ void _get_dmp_data( void ) {
 
 	mpu.getFIFOBytes( fifoBuffer, packetSize );
 
+#ifdef HARDWARE_INTERRUPT
+
+#endif
 	// printf( "%ld, %7d, %7d, %7d\n", mtime, acc.x, acc.y, acc.z );
 	// printf( "%ld, %7d, %7d, %7d\n", mtime, gyr.x, gyr.y, gyr.z );
 	// printf( "%ld, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, q.w, q.x, q.y, q.z );
 	return;
+}
+
+const std::string currentDateTime() {
+	time_t	  now = time( 0 );
+	struct tm tstruct;
+	char	  buf[80];
+	tstruct = *localtime( &now );
+
+	strftime( buf, sizeof( buf ), "%Y%m%d%X", &tstruct );
+
+	return buf;
 }
 
 void buttonPressed( void ) {
@@ -99,9 +113,17 @@ void buttonPressed( void ) {
 
 	if( state ) {
 		state = false;
+		if( output_file != NULL ) {
+			fclose( output_file );
+		}
 		digitalWrite( LED_RED, HIGH );
 	} else {
 		state = true;
+		// Prep new file
+		file_name = currentDateTime() + "_data.csv";
+
+		output_file = fopen( file_name.c_str(), "w" );
+
 		digitalWrite( LED_RED, LOW );
 	}
 	printf( "State changed to %d\n", state );
@@ -194,7 +216,12 @@ void loop() {
 	if( state ) {
 		// Collecting data here with no interrupt
 		_get_dmp_data();
+
+		// print the data to the file
+		fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, acc.x, acc.y,
+			acc.z, gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
 	}
+
 #endif
 
 	gettimeofday( &endc, NULL );
