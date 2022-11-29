@@ -65,6 +65,9 @@ long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
 // ================================================================
 
 void _get_dmp_data() {
+	if( state ) {
+		return;
+	}
 	uint8_t _device_interrupt_status = mpu.getIntStatus();
 
 	// does the FIFO have data in it?
@@ -249,12 +252,12 @@ void loop() {
 	// 	mpu.getFIFOBytes( fifoBuffer, packetSize );
 
 	// 	// get the time to create the millis function
-	// 	gettimeofday( &endc, NULL );
-	// 	seconds	 = endc.tv_sec - startc.tv_sec;
-	// 	useconds = endc.tv_usec - startc.tv_usec;
+	gettimeofday( &endc, NULL );
+	seconds	 = endc.tv_sec - startc.tv_sec;
+	useconds = endc.tv_usec - startc.tv_usec;
 
-	// 	mtime = ( ( seconds ) *1000 + useconds / 1000.0 ) + 0.5; // current time in ms
-	// 	// display time in milliseconds
+	mtime = ( ( seconds ) *1000 + useconds / 1000.0 ) + 0.5; // current time in ms
+															 // 	// display time in milliseconds
 
 	// 	// Start of the processing block
 	// 	// End of the processing block
