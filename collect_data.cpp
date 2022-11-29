@@ -117,7 +117,9 @@ void setup() {
 	pinMode( BUTTON, INPUT );
 
 	// interrupt for the button
-	wiringPiISR( BUTTON, INT_EDGE_RISING, &buttonPressed );
+	if( wiringPiISR( BUTTON, INT_EDGE_RISING, &buttonPressed ) < 1 ) {
+		printf( "Error setting up button interrupt\n" );
+	}
 
 	digitalWrite( LED_RED, HIGH );
 	digitalWrite( LED_GREEN, LOW );
