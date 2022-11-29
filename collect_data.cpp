@@ -266,18 +266,18 @@ void loop() {
     useconds = endc.tv_usec - startc.tv_usec;
     mtime = ((seconds)*1000 + useconds / 1000.0) + 0.5;
     // display time in milliseconds
-    printf("\ntime %ld ms    ", mtime);
+    // printf("\ntime %ld ms    ", mtime);
 
 #ifdef OUTPUT_READABLE_ACCEL
     // display accel values in easy matrix form: x y z
     mpu.dmpGetAccel(&acc, fifoBuffer);
-    printf("accel  %6d %6d %6d    ", acc.x, acc.y, acc.z);
+    // printf("accel  %6d %6d %6d    ", acc.x, acc.y, acc.z);
 #endif
 
 #ifdef OUTPUT_READABLE_GYRO
     // display accel values in easy matrix form: x y z
     mpu.dmpGetGyro(&gyr, fifoBuffer);
-    printf("gryro  %6d %6d %6d    ", gyr.x, gyr.y, gyr.z);
+    // printf("gryro  %6d %6d %6d    ", gyr.x, gyr.y, gyr.z);
 #endif
 
 #ifdef OUTPUT_READABLE_QUATERNION
@@ -285,7 +285,8 @@ void loop() {
     mpu.dmpGetQuaternion(&q, fifoBuffer);
     // printf("quat %7.5f %7.5f %7.5f %7.5f    ", q.w,q.x,q.y,q.z);
     //  save quaternion values
-    // fprintf(arq_Quaternions,"%ld,%7.2f,%7.2f,%7.2f,%7.2f\n",mtime,q.w,q.x,q.y,q.z);
+    fprintf(arq_Quaternions, "%ld,%7.2f,%7.2f,%7.2f,%7.2f\n", mtime, q.w, q.x,
+            q.y, q.z);
 #endif
 
 #ifdef OUTPUT_READABLE_EULER
