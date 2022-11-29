@@ -147,7 +147,7 @@ void loop() {
   useconds = end.tv_usec - start.tv_usec;
   timestart = ((seconds)*1000 + useconds / 1000.0) + 0.5;
 
-  if (timestart > 25000)
+  if (timestart > 5000)
     digitalWrite(LED_GREEN, HIGH);
 
   if (digitalRead(BUTTON) == true && timestart > 25000) {
