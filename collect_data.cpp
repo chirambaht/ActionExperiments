@@ -64,7 +64,7 @@ long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
 // ===                      INITIAL SETUP                       ===
 // ================================================================
 
-void _get_dmp_data() {
+void _get_dmp_data( void ) {
 	if( state ) {
 		return;
 	}
@@ -89,7 +89,7 @@ void _get_dmp_data() {
 	return;
 }
 
-void buttonPressed() {
+void buttonPressed( void ) {
 	// debounce the button
 	if( millis() - press_time < 1000 ) {
 		return;
@@ -117,7 +117,7 @@ void setup() {
 	pinMode( BUTTON, INPUT );
 
 	// interrupt for the button
-	if( wiringPiISR( BUTTON, INT_EDGE_RISING, &buttonPressed ) < 1 ) {
+	if( wiringPiISR( BUTTON, INT_EDGE_RISING, &buttonPressed ) < 0 ) {
 		printf( "Error setting up button interrupt\n" );
 	}
 
@@ -130,9 +130,6 @@ void setup() {
 
 	// load and configure the DMP
 	printf( "Initializing DMP...\n" );
-
-	while( digitalRead( BUTTON ) == 1 ) {
-	}
 
 	devStatus = mpu.dmpInitialize();
 
@@ -151,7 +148,7 @@ void setup() {
 		mpu.setDMPEnabled( true );
 
 		// enable Interrupt on WiringPi
-		if( wiringPiISR( INTERRUPT_PIN, INT_EDGE_RISING, &_get_dmp_data ) < 1 ) {
+		if( wiringPiISR( INTERRUPT_PIN, INT_EDGE_RISING, &_get_dmp_data ) < 0 ) {
 			printf( "Error setting up DMP interrupt\n" );
 		}
 
