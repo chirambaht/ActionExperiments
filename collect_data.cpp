@@ -59,7 +59,7 @@ float		ypr[3];	  // [yaw, pitch, roll]   yaw/pitch/roll container and gravity ve
 int			press_time = 0;
 bool		state	   = false;
 // packet structure for InvenSense teapot demo
-
+int			dmp_rate = 0;
 FILE	   *output_file;
 std::string file_name = "data.csv";
 
@@ -210,7 +210,7 @@ void setup() {
 	// load and configure the DMP
 	printf( "Initializing DMP...\n" );
 
-	devStatus = mpu.dmpInitialize();
+	devStatus = mpu.dmpInitialize( 2 );
 
 	mpu.setXAccelOffset( -4103 );
 	mpu.setYAccelOffset( 1803 );
@@ -287,7 +287,15 @@ void loop() {
 	mtime = ( ( seconds ) *1000 + useconds / 1000.0 ) + 0.5; // current time in ms
 }
 
-int main() {
+int main( int argc, char *argv[] ) {
+	// check that user has provided a rate
+	if( argc < 2 ) {
+		printf( "Usage: %s <rate>\n", argv[0] );
+		return 1;
+	}
+
+	// set the rate
+	rate = atoi( argv[1] );
 	setup();
 	while( 1 ) {
 		loop();
