@@ -88,6 +88,18 @@ void _get_dmp_data( void ) {
 	mpu.dmpGetQuaternion( &q, fifoBuffer );
 	mpu.dmpGetGyro( &gyr, fifoBuffer );
 
+	// ======= ======= ======== The start of the processing block ======== ======= ========
+	// Fix the accelerometer data
+	acc.x /= ( 16384.0 / 9.81 );
+	acc.y /= ( 16384.0 / 9.81 );
+	acc.z /= ( 16384.0 / 9.81 );
+
+	// Fix the gyro data
+	gyr.x /= 16.4;
+	gyr.y /= 16.4;
+	gyr.z /= 16.4;
+
+// ======= ======= ========  The end of the processing block  ======== ======= ========
 #ifdef HARDWARE_INTERRUPT
 	fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, acc.x, acc.y, acc.z,
 		gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
