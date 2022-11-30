@@ -21,7 +21,7 @@
 #define BUTTON		  0
 #define INTERRUPT_PIN 27
 
-#define WAIT_TIME 10000
+#define WAIT_TIME 30000
 
 MPU6050 mpu;
 
@@ -93,6 +93,9 @@ void _get_dmp_data( void ) {
 		gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
 
 #endif
+
+	printf( "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, acc.x, acc.y, acc.z, gyr.x, gyr.y,
+		gyr.z, q.w, q.x, q.y, q.z );
 
 	return;
 }
