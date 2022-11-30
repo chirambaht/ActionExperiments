@@ -210,7 +210,7 @@ void setup() {
 	// load and configure the DMP
 	printf( "Initializing DMP...\n" );
 
-	devStatus = mpu.dmpInitialize( 2 );
+	devStatus = mpu.dmpInitialize( dmp_rate );
 
 	mpu.setXAccelOffset( -4103 );
 	mpu.setYAccelOffset( 1803 );
@@ -295,7 +295,7 @@ int main( int argc, char *argv[] ) {
 	}
 
 	// set the rate
-	rate = atoi( argv[1] );
+	dmp_rate = atoi( argv[1] );
 	setup();
 	while( 1 ) {
 		loop();
