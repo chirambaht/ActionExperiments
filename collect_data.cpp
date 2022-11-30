@@ -27,14 +27,6 @@
 
 MPU6050 mpu;
 
-#define OUTPUT_READABLE_ACCEL
-#define OUTPUT_READABLE_GYRO
-#define OUTPUT_READABLE_QUATERNION
-//#define OUTPUT_READABLE_EULER
-//#define OUTPUT_READABLE_YAWPITCHROLL
-// #define OUTPUT_READABLE_REALACCEL
-//#define OUTPUT_READABLE_WORLDACCEL
-
 // MPU control/status vars
 bool	dmpReady = false; // set true if DMP init was successful
 uint8_t mpuIntStatus;	  // holds actual interrupt status byte from MPU
@@ -60,12 +52,10 @@ int			press_time = 0;
 bool		state	   = false;
 // packet structure for InvenSense teapot demo
 int			dmp_rate = 0;
-FILE	   *output_file;
+FILE *		output_file;
 std::string file_name = "data.csv";
 
-struct timeval start, end, startc, endc, startb, endb;
-long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
-long		   recording_start = 0;
+long recording_start = 0;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -94,7 +84,7 @@ void _get_dmp_data( void ) {
 	mpu.dmpGetQuaternion( &q, fifoBuffer );
 	mpu.dmpGetGyro( &gyr, fifoBuffer );
 
-	// ======= ======= ======== The start of the processing block ======== ======= ========
+	// ======= ======= ======== The start of the processing block ======== =======
 	// Fix the accelerometer data
 	mpu.dmpGetGravity( &gravity, &q );
 	mpu.dmpGetLinearAccel( &accReal, &acc, &gravity );
@@ -104,20 +94,7 @@ void _get_dmp_data( void ) {
 	gyr.y /= 16.4;
 	gyr.z /= 16.4;
 
-	// ======= ======= ========  The end of the processing block  ======== ======= ========
-
-	// // print time
-	// printf( "%ld\n", mtime );
-	// // Neatly print the fifoPacket to the console as a hex
-	// for( int i = 0; i < packetSize; i++ ) {
-	// 	printf( "%02x ", fifoBuffer[i] );
-	// 	if( i % 16 == 15 ) {
-	// 		printf( "\n" );
-	// 	} else if( i % 8 == 7 ) {
-	// 		printf( " " );
-	// 	}
-	// }
-	// printf( "\n\n" );
+	// ======= ======= ========  The end of the processing block  ======== =======
 
 	// count packets per second
 
@@ -234,24 +211,12 @@ void setup() {
 		}
 #endif
 		mpuIntStatus = mpu.getIntStatus();
-
-		// set our DMP Ready flag so the main loop() function knows it's okay to use
-		// it
 		printf( "DMP ready!\n" );
-		dmpReady = true;
-
-		// get expected DMP packet size for later comparison
+		dmpReady   = true;
 		packetSize = mpu.dmpGetFIFOPacketSize();
 	} else {
-		// ERROR!
-		// 1 = initial memory load failed
-		// 2 = DMP configuration updates failed
-		// (if it's going to break, usually the code will be 1)
 		printf( "DMP Initialization failed (code %d)\n", devStatus );
 	}
-
-	gettimeofday( &start, NULL );
-	gettimeofday( &startc, NULL );
 }
 
 // ================================================================
@@ -260,10 +225,6 @@ void setup() {
 
 void loop() {
 	// Get start time
-	gettimeofday( &end, NULL );
-	seconds	  = end.tv_sec - start.tv_sec;
-	useconds  = end.tv_usec - start.tv_usec;
-	timestart = ( ( seconds ) *1000 + useconds / 1000.0 ) + 0.5;
 
 	if( timestart > WAIT_TIME && !state )
 		digitalWrite( LED_GREEN, HIGH );
@@ -280,12 +241,6 @@ void loop() {
 	}
 
 #endif
-
-	gettimeofday( &endc, NULL );
-	seconds	 = endc.tv_sec - startc.tv_sec;
-	useconds = endc.tv_usec - startc.tv_usec;
-
-	mtime = ( ( seconds ) *1000 + useconds / 1000.0 ) + 0.5; // current time in ms
 }
 
 int main( int argc, char *argv[] ) {
