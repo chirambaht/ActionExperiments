@@ -209,11 +209,12 @@ void setup() {
 		printf( "Enabling DMP...\n" );
 		mpu.setDMPEnabled( true );
 
-		// enable hardware Interrupt on WiringPi
-		// if( wiringPiISR( INTERRUPT_PIN, INT_EDGE_RISING, &_get_dmp_data ) < 0 ) {
-		// 	printf( "Error setting up DMP interrupt\n" );
-		// }
-
+// enable hardware Interrupt on WiringPi
+#ifdef HARDWARE_INTERRUPT
+		if( wiringPiISR( INTERRUPT_PIN, INT_EDGE_RISING, &_get_dmp_data ) < 0 ) {
+			printf( "Error setting up DMP interrupt\n" );
+		}
+#endif
 		mpuIntStatus = mpu.getIntStatus();
 
 		// set our DMP Ready flag so the main loop() function knows it's okay to use
