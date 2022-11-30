@@ -82,7 +82,14 @@ void _get_dmp_data( void ) {
 
 	mpu.getFIFOBytes( fifoBuffer, packetSize );
 
+	mpu.dmpGetAccel( &acc, fifoBuffer );
+	mpu.dmpGetQuaternion( &q, fifoBuffer );
+	mpu.dmpGetGyro( &gyr, fifoBuffer );
+
 #ifdef HARDWARE_INTERRUPT
+	fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, acc.x, acc.y, acc.z,
+		gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
+#else
 
 #endif
 	// printf( "%ld, %7d, %7d, %7d\n", mtime, acc.x, acc.y, acc.z );
