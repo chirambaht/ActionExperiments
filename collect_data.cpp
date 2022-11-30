@@ -106,8 +106,16 @@ void _get_dmp_data( void ) {
 
 #endif
 
-	printf( "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, acc.x, acc.y, acc.z, gyr.x, gyr.y,
-		gyr.z, q.w, q.x, q.y, q.z );
+	// Neatly print the fifoPacket to the console as a hex
+	for( int i = 0; i < packetSize; i++ ) {
+		printf( "%02x ", fifoBuffer[i] );
+		if( i % 16 == 15 ) {
+			printf( "\n" );
+		} else if( i % 8 == 7 ) {
+			printf( " " );
+		}
+	}
+	printf( "\n" );
 
 	return;
 }
