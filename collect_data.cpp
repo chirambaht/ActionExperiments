@@ -21,7 +21,7 @@
 #define BUTTON		  0
 #define INTERRUPT_PIN 27
 
-#define WAIT_TIME 30000
+#define WAIT_TIME 10000
 
 #define HARDWARE_INTERRUPT
 
@@ -95,9 +95,9 @@ void _get_dmp_data( void ) {
 
 	// ======= ======= ======== The start of the processing block ======== ======= ========
 	// Fix the accelerometer data
-	acc.x /= ( 16384.0 );
-	acc.y /= ( 16384.0 );
-	acc.z /= ( 16384.0 );
+	// acc.x /= ( 16384.0 );
+	// acc.y /= ( 16384.0 );
+	// acc.z /= ( 16384.0 );
 
 	// Fix the gyro data
 	gyr.x /= 16.4;
