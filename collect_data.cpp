@@ -23,6 +23,8 @@
 
 #define WAIT_TIME 30000
 
+#define HARDWARE_INTERRUPT
+
 MPU6050 mpu;
 
 #define OUTPUT_READABLE_ACCEL
@@ -99,12 +101,8 @@ void _get_dmp_data( void ) {
 	gyr.y /= 16.4;
 	gyr.z /= 16.4;
 
-// ======= ======= ========  The end of the processing block  ======== ======= ========
-#ifdef HARDWARE_INTERRUPT
-	fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, acc.x, acc.y, acc.z,
-		gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
+	// ======= ======= ========  The end of the processing block  ======== ======= ========
 
-#endif
 	// print time
 	printf( "%ld\n", mtime );
 	// Neatly print the fifoPacket to the console as a hex
@@ -118,6 +116,10 @@ void _get_dmp_data( void ) {
 	}
 	printf( "\n\n" );
 
+#ifdef HARDWARE_INTERRUPT
+	fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, acc.x, acc.y, acc.z,
+		gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
+#endif
 	return;
 }
 
