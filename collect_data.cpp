@@ -46,6 +46,7 @@ uint8_t	 fifoBuffer[64];  // FIFO storage buffer
 
 int pps			= 0;
 int packetCount = 0;
+int lastUpdate	= 0;
 // orientation/motion vars
 Quaternion	q;		  // [w, x, y, z]         quaternion container
 VectorInt16 acc;	  // [x, y, z]            accel sensor measurements
