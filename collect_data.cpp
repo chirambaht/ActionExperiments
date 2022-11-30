@@ -65,6 +65,7 @@ std::string file_name = "data.csv";
 
 struct timeval start, end, startc, endc, startb, endb;
 long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
+long		   recording_start = 0;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -134,8 +135,8 @@ void _get_dmp_data( void ) {
 	packetCount++;
 
 #ifdef HARDWARE_INTERRUPT
-	fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, acc.x, acc.y, acc.z,
-		gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
+	fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", millis() - recording_start,
+		acc.x, acc.y, acc.z, gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
 #endif
 	return;
 }
@@ -179,8 +180,9 @@ void buttonPressed( void ) {
 
 		// Write header
 		fprintf( output_file, "time, acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z, q_w, q_x, q_y, q_z\n" );
-		printf( "Writing to: %s...", file_name.c_str() );
+		printf( "Writing to: %s...\n", file_name.c_str() );
 		digitalWrite( LED_RED, LOW );
+		recording_start = millis();
 	}
 }
 
@@ -274,8 +276,8 @@ void loop() {
 		_get_dmp_data();
 
 		// print the data to the file
-		fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, acc.x, acc.y,
-			acc.z, gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
+		fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n",
+			millis() - recording_start, acc.x, acc.y, acc.z, gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
 	}
 
 #endif
