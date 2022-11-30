@@ -80,7 +80,7 @@ void _get_dmp_data( void ) {
 
 	fifoCount = mpu.getFIFOCount();
 
-	if( fifoCount < packetSize ) {
+	if( fifoCount < packetSize || fifoCount > 1024 ) {
 		return;
 	}
 
@@ -92,9 +92,9 @@ void _get_dmp_data( void ) {
 
 	// ======= ======= ======== The start of the processing block ======== ======= ========
 	// Fix the accelerometer data
-	acc.x /= ( 16384.0 / 9.81 );
-	acc.y /= ( 16384.0 / 9.81 );
-	acc.z /= ( 16384.0 / 9.81 );
+	acc.x /= ( 16384.0 );
+	acc.y /= ( 16384.0 );
+	acc.z /= ( 16384.0 );
 
 	// Fix the gyro data
 	gyr.x /= 16.4;
