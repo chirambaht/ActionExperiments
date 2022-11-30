@@ -96,9 +96,8 @@ void _get_dmp_data( void ) {
 
 	// ======= ======= ======== The start of the processing block ======== ======= ========
 	// Fix the accelerometer data
-	// acc.x /= ( 16384.0 );
-	// acc.y /= ( 16384.0 );
-	// acc.z /= ( 16384.0 );
+	mpu.dmpGetGravity( &gravity, &q );
+	mpu.dmpGetLinearAccel( &accReal, &acc, &gravity );
 
 	// Fix the gyro data
 	gyr.x /= 16.4;
@@ -136,7 +135,7 @@ void _get_dmp_data( void ) {
 
 #ifdef HARDWARE_INTERRUPT
 	fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", millis() - recording_start,
-		acc.x, acc.y, acc.z, gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
+		accReal.x, accReal.y, accReal.z, gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
 #endif
 	return;
 }
@@ -277,7 +276,7 @@ void loop() {
 
 		// print the data to the file
 		fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n",
-			millis() - recording_start, acc.x, acc.y, acc.z, gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
+			millis() - recording_start, accReal.x, accReal.y, accReal.z, gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
 	}
 
 #endif
@@ -298,10 +297,10 @@ int main( int argc, char *argv[] ) {
 		printf( "--------------+-------\n" );
 		printf( "     200Hz    |  0\n" );
 		printf( "     100Hz    |  1\n" );
-		printf( "     66.67Hz  |  2\n" );
+		printf( "     67Hz     |  2\n" );
 		printf( "     50Hz     |  3\n" );
 		printf( "     40Hz     |  4\n" );
-		printf( "     33.33Hz  |  5\n" );
+		printf( "     33Hz     |  5\n" );
 		printf( "     20Hz     |  9\n" );
 		printf( "     10Hz     |  19\n" );
 		printf( "     5Hz      |  39\n" );
