@@ -21,6 +21,8 @@
 #define BUTTON		  0
 #define INTERRUPT_PIN 27
 
+#define WAIT_TIME 10000
+
 MPU6050 mpu;
 
 #define OUTPUT_READABLE_ACCEL
@@ -125,6 +127,9 @@ void buttonPressed( void ) {
 		}
 		digitalWrite( LED_RED, HIGH );
 	} else {
+		if( timestart < WAIT_TIME ) {
+			return;
+		}
 		state = true;
 		// Prep new file
 		file_name = currentDateTime() + "_data.csv";
@@ -215,7 +220,7 @@ void loop() {
 	useconds  = end.tv_usec - start.tv_usec;
 	timestart = ( ( seconds ) *1000 + useconds / 1000.0 ) + 0.5;
 
-	if( timestart > 10000 && !state )
+	if( timestart > WAIT_TIME && !state )
 		digitalWrite( LED_GREEN, HIGH );
 
 #ifndef HARDWARE_INTERRUPT
