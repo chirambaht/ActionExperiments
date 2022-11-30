@@ -44,6 +44,8 @@ uint16_t packetSize;	  // expected DMP packet size (default is 42 bytes)
 uint16_t fifoCount;		  // count of all bytes currently in FIFO
 uint8_t	 fifoBuffer[64];  // FIFO storage buffer
 
+int pps			= 0;
+int packetCount = 0;
 // orientation/motion vars
 Quaternion	q;		  // [w, x, y, z]         quaternion container
 VectorInt16 acc;	  // [x, y, z]            accel sensor measurements
@@ -103,18 +105,32 @@ void _get_dmp_data( void ) {
 
 	// ======= ======= ========  The end of the processing block  ======== ======= ========
 
-	// print time
-	printf( "%ld\n", mtime );
-	// Neatly print the fifoPacket to the console as a hex
-	for( int i = 0; i < packetSize; i++ ) {
-		printf( "%02x ", fifoBuffer[i] );
-		if( i % 16 == 15 ) {
-			printf( "\n" );
-		} else if( i % 8 == 7 ) {
-			printf( " " );
+	// // print time
+	// printf( "%ld\n", mtime );
+	// // Neatly print the fifoPacket to the console as a hex
+	// for( int i = 0; i < packetSize; i++ ) {
+	// 	printf( "%02x ", fifoBuffer[i] );
+	// 	if( i % 16 == 15 ) {
+	// 		printf( "\n" );
+	// 	} else if( i % 8 == 7 ) {
+	// 		printf( " " );
+	// 	}
+	// }
+	// printf( "\n\n" );
+
+	// count packets per second
+
+	if( lastUpdate == 0 ) {
+		lastUpdate = millis();
+	} else {
+		if( millis() - lastUpdate >= 1000 ) {
+			pps			= packetCount;
+			packetCount = 0;
+			lastUpdate += 1000;
+			printf( "Packets per second: %d \n", pps );
 		}
 	}
-	printf( "\n\n" );
+	packetCount++;
 
 #ifdef HARDWARE_INTERRUPT
 	fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, acc.x, acc.y, acc.z,
