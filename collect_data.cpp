@@ -91,12 +91,9 @@ void _get_dmp_data( void ) {
 #ifdef HARDWARE_INTERRUPT
 	fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, acc.x, acc.y, acc.z,
 		gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
-#else
 
 #endif
-	// printf( "%ld, %7d, %7d, %7d\n", mtime, acc.x, acc.y, acc.z );
-	// printf( "%ld, %7d, %7d, %7d\n", mtime, gyr.x, gyr.y, gyr.z );
-	// printf( "%ld, %7.5f, %7.5f, %7.5f, %7.5f\n", mtime, q.w, q.x, q.y, q.z );
+
 	return;
 }
 
@@ -124,6 +121,7 @@ void buttonPressed( void ) {
 		state = false;
 		if( output_file != NULL ) {
 			fclose( output_file );
+			printf( "done and closed!\n" );
 		}
 		digitalWrite( LED_RED, HIGH );
 	} else {
@@ -136,9 +134,11 @@ void buttonPressed( void ) {
 
 		output_file = fopen( file_name.c_str(), "w" );
 
+		// Write header
+		fprintf( output_file, "time, acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z, q_w, q_x, q_y, q_z\n" );
+		printf( "Writing to: %s...", file_name.c_str() );
 		digitalWrite( LED_RED, LOW );
 	}
-	printf( "State changed to %d\n", state );
 }
 
 void setup() {
