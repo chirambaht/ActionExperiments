@@ -105,7 +105,8 @@ void _get_dmp_data( void ) {
 		gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
 
 #endif
-
+	// print time
+	printf( "%ld\n", mtime );
 	// Neatly print the fifoPacket to the console as a hex
 	for( int i = 0; i < packetSize; i++ ) {
 		printf( "%02x ", fifoBuffer[i] );
@@ -115,7 +116,7 @@ void _get_dmp_data( void ) {
 			printf( " " );
 		}
 	}
-	printf( "\n" );
+	printf( "\n\n" );
 
 	return;
 }
