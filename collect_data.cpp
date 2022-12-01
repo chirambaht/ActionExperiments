@@ -55,7 +55,7 @@ int			dmp_rate = 0;
 FILE	   *output_file;
 std::string file_name = "data.csv";
 
-long recording_start = 0;
+long recording_start = 0, timestart = 0;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -163,6 +163,7 @@ void buttonPressed( void ) {
 }
 
 void setup() {
+	timestart = millis();
 	// initialize device
 	printf( "Initializing I2C devices...\n" );
 	mpu.initialize();
