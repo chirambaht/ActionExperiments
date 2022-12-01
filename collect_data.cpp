@@ -52,7 +52,7 @@ int			press_time = 0;
 bool		state	   = false;
 // packet structure for InvenSense teapot demo
 int			dmp_rate = 0;
-FILE *		output_file;
+FILE	   *output_file;
 std::string file_name = "data.csv";
 
 long recording_start = 0;
@@ -190,13 +190,13 @@ void setup() {
 
 	devStatus = mpu.dmpInitialize( dmp_rate );
 
-	mpu.setXAccelOffset( -4103 );
-	mpu.setYAccelOffset( 1803 );
-	mpu.setZAccelOffset( 1225 );
+	mpu.setXAccelOffset( -4094 );
+	mpu.setYAccelOffset( 1792 );
+	mpu.setZAccelOffset( 1228 );
 
-	mpu.setXGyroOffset( 162 );
+	mpu.setXGyroOffset( 161 );
 	mpu.setYGyroOffset( -41 );
-	mpu.setZGyroOffset( -500 );
+	mpu.setZGyroOffset( 20 );
 
 	// make sure it worked (returns 0 if so)
 	if( devStatus == 0 ) {
