@@ -83,13 +83,14 @@ void setup() {
 	printf( "Initializing DMP...\n" );
 	devStatus = mpu.dmpInitialize();
 
-	mpu.setXAccelOffset( -2757 );
-	mpu.setYAccelOffset( 417 );
-	mpu.setZAccelOffset( 1191 );
+	mpu.setXAccelOffset( -4029 );
+	mpu.setYAccelOffset( 1758 );
+	mpu.setZAccelOffset( 1234 );
 
-	mpu.setXGyroOffset( -609 );
-	mpu.setYGyroOffset( -474 );
-	mpu.setZGyroOffset( 415 );
+	mpu.setXGyroOffset( 1600 );
+	mpu.setYGyroOffset( -39 );
+	mpu.setZGyroOffset( 18 );
+
 	// My offsets
 	//            XAccel			     YAccel				   ZAccel			               XGyro YGyro ZGyro
 	//[-2679,-2678] --> [-15,1]	[398,398] --> [-1,2]	[1205,1206] --> [16381,16391]	[-116,-115] --> [-4,2]	[69,70]
