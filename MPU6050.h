@@ -39,6 +39,7 @@ THE SOFTWARE.
 
 #include "I2Cdev.h"
 
+#include <cstddef>
 #include <cstdint>
 
 // supporting link:  http://forum.arduino.cc/index.php?&topic=143444.msg1079517#msg1079517
