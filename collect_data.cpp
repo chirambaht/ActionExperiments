@@ -47,7 +47,6 @@ VectorFloat gravity;  // [x, y, z]            gravity vector
 float		euler[3]; // [psi, theta, phi]    Euler angle container
 float		ypr[3];	  // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
-int	 LED_RED = 2, LED_GREEN = 0, BUTTON = 3;
 bool state = 0;
 
 FILE *arq_Accel, *arq_Gyro, *arq_Quaternions, *arq_All;

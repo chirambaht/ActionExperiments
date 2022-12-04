@@ -41,7 +41,7 @@ THE SOFTWARE.
 #include <cmath>
 #include <cstdint>
 #include <cstring>
-
+#include <unistd.h>
 
 // MotionApps 2.0 DMP implementation, built using the MPU-6050EVB evaluation board
 #define MPU6050_INCLUDE_DMP_MOTIONAPPS20
