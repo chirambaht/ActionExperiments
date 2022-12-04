@@ -182,7 +182,7 @@ void loop() {
 			arq_Quaternions = fopen( Data_Quaternions.c_str(), "wt" );
 			fprintf( arq_Quaternions, "time,qw,qx,qy,qz\n" );
 
-			arq_All = fopen( arq_All.c_str(), "wt" );
+			arq_All = fopen( Data_All.c_str(), "wt" );
 			fprintf( arq_All, "time,accx,accy,accz,gyrx,gyry,gyrz,qw,qx,qy,qz\n" );
 
 			gettimeofday( &startc, NULL );
