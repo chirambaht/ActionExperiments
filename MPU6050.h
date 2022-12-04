@@ -827,7 +827,7 @@ class MPU6050 {
 // special methods for MotionApps 2.0 implementation
 #ifdef MPU6050_INCLUDE_DMP_MOTIONAPPS20
 
-	uint8_t dmpInitialize();
+	uint8_t dmpInitialize( uint8_t );
 	bool	dmpPacketAvailable();
 
 	uint8_t dmpSetFIFORate( uint8_t fifoRate );

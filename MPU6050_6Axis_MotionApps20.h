@@ -2086,7 +2086,7 @@ const unsigned char dmpMemory[MPU6050_DMP_CODE_SIZE] PROGMEM = {
 #endif
 
 // I Simplified this:
-uint8_t MPU6050::dmpInitialize() {
+uint8_t MPU6050::dmpInitialize( uint8_t rate = MPU6050_DMP_FIFO_RATE_DIVISOR ) {
 	// reset device
 	DEBUG_PRINTLN( F( "\n\nResetting MPU6050..." ) );
 	reset();
