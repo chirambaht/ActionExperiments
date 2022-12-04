@@ -171,8 +171,7 @@ void loop() {
 			mkdir( new_dir.c_str(), atributes.st_mode );
 
 			std::string Data_Accel = namepaste + "/Data_Accel.txt", Data_Gyro = namepaste + "/Data_Gyro.txt",
-						Data_Quaternions = namepaste + "/Data_Quaternions.txt",
-						Data_LinearAcc	 = namepaste + "/Data_LinearAcc.txt";
+						Data_Quaternions = namepaste + "/Data_Quaternions.txt", Data_All = namepaste + "/Data_All.txt";
 
 			arq_Accel = fopen( Data_Accel.c_str(), "wt" );
 			fprintf( arq_Accel, "time,accx,accy,accz\n" );
@@ -182,6 +181,9 @@ void loop() {
 
 			arq_Quaternions = fopen( Data_Quaternions.c_str(), "wt" );
 			fprintf( arq_Quaternions, "time,qw,qx,qy,qz\n" );
+
+			arq_All = fopen( arq_All.c_str(), "wt" );
+			fprintf( arq_All, "time,accx,accy,accz,gyrx,gyry,gyrz,qw,qx,qy,qz\n" );
 
 			gettimeofday( &startc, NULL );
 		}
