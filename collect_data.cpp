@@ -236,7 +236,9 @@ void loop() {
 
 		// End of timing block
 		gettimeofday( &endt, NULL );
-		proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000 + ( endt.tv_usec - startt.tv_usec ) / 1000.0 ) + 0.5;
+		// proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000 + ( endt.tv_usec - startt.tv_usec ) / 1000.0 ) + 0.5;
+		// Get time in microseconds
+		proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000000 + ( endt.tv_usec - startt.tv_usec ) ) + 0.5;
 
 		if( state ) {
 			fprintf( arq_Accel, "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
