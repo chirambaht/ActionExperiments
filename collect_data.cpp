@@ -55,12 +55,13 @@ int fifo_rate = DMP_FIFO_RATE_DIVISOR;
 int fifo_rate = 0;
 #endif
 
-FILE *arq_Accel, *arq_Gyro, *arq_Quaternions, *arq_All;
+FILE *arq_Accel, *arq_Gyro, *arq_Quaternions, *arq_All, *arq_Timing;
 
 std::string namepaste = "";
 
-struct timeval start, end, startc, endc, startb, endb;
+struct timeval start, end, startc, endc, startb, endb, startt, endt;
 long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
+long		   proc_time;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -151,6 +152,7 @@ void loop() {
 			fclose( arq_Gyro );
 			fclose( arq_Quaternions );
 			fclose( arq_All );
+			fclose( arq_Timing );
 			digitalWrite( LED_RED, HIGH );
 		} else {
 			digitalWrite( LED_RED, LOW );
@@ -166,9 +168,7 @@ void loop() {
 				perror( "Couldn't open the directory" );
 			}
 
-			printf( "%d", dir_len );
 			namepaste = "Datas/data_" + std::to_string( dir_len - 2 );
-			printf( namepaste.c_str() );
 
 			std::string new_dir		 = namepaste;
 			std::string existing_dir = ".";
@@ -176,8 +176,9 @@ void loop() {
 			stat( existing_dir.c_str(), &atributes );
 			mkdir( new_dir.c_str(), atributes.st_mode );
 
-			std::string Data_Accel = namepaste + "/Data_Accel.txt", Data_Gyro = namepaste + "/Data_Gyro.txt",
-						Data_Quaternions = namepaste + "/Data_Quaternions.txt", Data_All = namepaste + "/Data_All.txt";
+			std::string Data_Accel = namepaste + "/Data_Accel.csv", Data_Gyro = namepaste + "/Data_Gyro.csv",
+						Data_Quaternions = namepaste + "/Data_Quaternions.csv", Data_All = namepaste + "/Data_All.csv",
+						Data_Timing = namepaste + "/Data_Timing.csv";
 
 			arq_Accel = fopen( Data_Accel.c_str(), "wt" );
 			fprintf( arq_Accel, "time,accx,accy,accz\n" );
@@ -190,6 +191,9 @@ void loop() {
 
 			arq_All = fopen( Data_All.c_str(), "wt" );
 			fprintf( arq_All, "time,accx,accy,accz,gyrx,gyry,gyrz,qw,qx,qy,qz\n" );
+
+			arq_Timing = fopen( Data_Timing.c_str(), "wt" );
+			fprintf( arq_Timing, "time,proc\n" );
 
 			gettimeofday( &startc, NULL );
 		}
@@ -224,12 +228,24 @@ void loop() {
 		mpu.dmpGetGyro( &gyr, fifoBuffer );
 		mpu.dmpGetQuaternion( &q, fifoBuffer );
 
+		// Start of timing block
+		gettimeofday( &startt, NULL );
+
+		// compute Euler angles, etc.
+		mpu.dmpGetEuler( euler, &q );
+
+		// End of timing block
+		gettimeofday( &endt, NULL );
+		proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000 + ( endt.tv_usec - startt.tv_usec ) / 1000.0 ) + 0.5;
+
 		if( state ) {
 			fprintf( arq_Accel, "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
 			fprintf( arq_Gyro, "%ld,%6d,%6d,%6d\n", mtime, gyr.x, gyr.y, gyr.z );
 			fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
 			fprintf( arq_All, "%ld,%6d,%6d,%6d,%6d,%6d,%6d,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, acc.x, acc.y, acc.z,
 				gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
+
+			fprintf( arq_Timing, "%ld,%ld\n", mtime, proc_time );
 		}
 	}
 }
