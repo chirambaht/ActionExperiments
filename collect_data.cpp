@@ -1,6 +1,7 @@
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 
+#include <algorithm>
 #include <dirent.h>
 #include <filesystem>
 #include <iostream>
@@ -86,7 +87,7 @@ float median_filter( std::vector<float> &v, float new_value ) {
 	while( v.size() > FILTER_WINDOW_SIZE ) {
 		v.erase( v.begin() );
 	}
-
+	std::vector<float> v_sorted = v;
 	std::sort( v.begin(), v.end() );
 	return v[v_sorted.size() / 2];
 }
