@@ -49,8 +49,7 @@ float		ypr[3];	  // [yaw, pitch, roll]   yaw/pitch/roll container and gravity ve
 
 bool state = 0;
 
-int fifo_rate = 1;
-int fps;
+int fps = 0;
 
 #ifdef DMP_FIFO_RATE_DIVISOR
 int fifo_rate = DMP_FIFO_RATE_DIVISOR;
@@ -155,6 +154,7 @@ void loop() {
 			fclose( arq_Quaternions );
 			fclose( arq_All );
 			fclose( arq_fps );
+			fps = 0;
 			digitalWrite( LED_RED, HIGH );
 		} else {
 			digitalWrite( LED_RED, LOW );
@@ -274,7 +274,7 @@ int main( int argc, char **argv ) {
 
 		return 1;
 	}
-	int fifo_rate = atoi( argv[1] );
+	fifo_rate = atoi( argv[1] );
 	setup();
 	while( 1 ) {
 		loop();
