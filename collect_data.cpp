@@ -70,14 +70,16 @@ void _get_dmp_data( void ) {
 
 	fifoCount = mpu.getFIFOCount();
 
-	if( fifoCount < packetSize || fifoCount > 1024 ) {
+	if( fifoCount < packetSize ) {
+		return;
+	} else if( fifoCount > 1024 ) {
+		mpu.resetFIFO();
 		return;
 	}
 
 	mpu.getFIFOBytes( fifoBuffer, packetSize );
-
-	mpu.dmpGetAccel( &acc, fifoBuffer );
 	mpu.dmpGetQuaternion( &q, fifoBuffer );
+	mpu.dmpGetAccel( &acc, fifoBuffer );
 	mpu.dmpGetGyro( &gyr, fifoBuffer );
 
 	// ======= ======= ======== The start of the processing block ======== =======
