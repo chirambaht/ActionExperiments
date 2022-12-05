@@ -290,16 +290,16 @@ void loop() {
 
 		// ======= ====== ======= Start of timing block  ======= ====== =======
 
-		acc.x = mean_filter( accX, acc.x );
-		acc.y = mean_filter( accY, acc.y );
-		acc.z = mean_filter( accZ, acc.z );
-		gyr.x = mean_filter( gyrX, gyr.x );
-		gyr.y = mean_filter( gyrY, gyr.y );
-		gyr.z = mean_filter( gyrZ, gyr.z );
-		q.w	  = mean_filter( qW, q.w );
-		q.x	  = mean_filter( qX, q.x );
-		q.y	  = mean_filter( qY, q.z );
-		q.z	  = mean_filter( qZ, q.z );
+		acc.x = mode_filter( accX, acc.x );
+		acc.y = mode_filter( accY, acc.y );
+		acc.z = mode_filter( accZ, acc.z );
+		gyr.x = mode_filter( gyrX, gyr.x );
+		gyr.y = mode_filter( gyrY, gyr.y );
+		gyr.z = mode_filter( gyrZ, gyr.z );
+		q.w	  = mode_filter( qW, q.w );
+		q.x	  = mode_filter( qX, q.x );
+		q.y	  = mode_filter( qY, q.z );
+		q.z	  = mode_filter( qZ, q.z );
 
 		// ======= ====== ======= End of timing block  ======= ====== =======
 
