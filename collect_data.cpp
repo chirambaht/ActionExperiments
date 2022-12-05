@@ -55,12 +55,12 @@ int fifo_rate = DMP_FIFO_RATE_DIVISOR;
 int fifo_rate = 0;
 #endif
 
-FILE *arq_Accel, *arq_Gyro, *arq_Quaternions, *arq_All;
+FILE *arq_Accel, *arq_Gyro, *arq_Quaternions, *arq_All, *arq_fps;
 
 std::string namepaste = "";
 
-struct timeval start, end, startc, endc, startb, endb;
-long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
+struct timeval start, end, startc, endc, startb, endb, startd;
+long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb, secondsd, usecondsd, timestartd;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -151,6 +151,7 @@ void loop() {
 			fclose( arq_Gyro );
 			fclose( arq_Quaternions );
 			fclose( arq_All );
+			fclose( arq_fps );
 			digitalWrite( LED_RED, HIGH );
 		} else {
 			digitalWrite( LED_RED, LOW );
@@ -176,8 +177,9 @@ void loop() {
 			stat( existing_dir.c_str(), &atributes );
 			mkdir( new_dir.c_str(), atributes.st_mode );
 
-			std::string Data_Accel = namepaste + "/Data_Accel.txt", Data_Gyro = namepaste + "/Data_Gyro.txt",
-						Data_Quaternions = namepaste + "/Data_Quaternions.txt", Data_All = namepaste + "/Data_All.txt";
+			std::string Data_Accel = namepaste + "/Data_Accel.csv", Data_Gyro = namepaste + "/Data_Gyro.csv",
+						Data_Quaternions = namepaste + "/Data_Quaternions.csv", Data_All = namepaste + "/Data_All.csv",
+						Data_fps = namepaste + "/Data_fps.csv";
 
 			arq_Accel = fopen( Data_Accel.c_str(), "wt" );
 			fprintf( arq_Accel, "time,accx,accy,accz\n" );
@@ -190,6 +192,9 @@ void loop() {
 
 			arq_All = fopen( Data_All.c_str(), "wt" );
 			fprintf( arq_All, "time,accx,accy,accz,gyrx,gyry,gyrz,qw,qx,qy,qz\n" );
+
+			arq_fps = fopen( Data_fps.c_str(), "wt" );
+			fprintf( arq_fps, "time,fps\n" );
 
 			gettimeofday( &startc, NULL );
 		}
@@ -230,6 +235,19 @@ void loop() {
 			fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
 			fprintf( arq_All, "%ld,%6d,%6d,%6d,%6d,%6d,%6d,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, acc.x, acc.y, acc.z,
 				gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
+
+			gettimeofday( &endd, NULL );
+			secondsd   = endd.tv_sec - startd.tv_sec;
+			usecondsd  = endd.tv_usec - startd.tv_usec;
+			timestartd = ( ( secondsd ) *1000 + usecondsd / 1000.0 ) + 0.5;
+			if( timestartd - timestartb >= 1000 ) {
+				fprintf( arq_fps, "%ld,%d\n", timestartd, fps );
+				fps = 0;
+				gettimeofday( &startd, NULL );
+				timestartb = timestartd;
+			} else {
+				fps++;
+			}
 		}
 	}
 }

@@ -2,3 +2,4 @@
 Data*/*
 .clang-format
 sequence_motor_driver*/*
+.vscode/settings.json
