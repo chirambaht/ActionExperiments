@@ -70,7 +70,7 @@ void _get_dmp_data( void ) {
 
 	fifoCount = mpu.getFIFOCount();
 
-	if( fifoCount < packetSize ) {
+	if( fifoCount < 42 ) {
 		return;
 	} else if( fifoCount > 1024 ) {
 		mpu.resetFIFO();
