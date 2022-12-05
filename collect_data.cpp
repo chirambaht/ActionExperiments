@@ -13,21 +13,19 @@
 #include <sys/time.h>
 #include <sys/timeb.h>
 #include <unistd.h>
+#include <vector>
 #include <wiringPi.h>
 
-#define LED_RED	  25
-#define LED_GREEN 29
-#define BUTTON	  0
+#define LED_RED			   25
+#define LED_GREEN		   29
+#define BUTTON			   0
+#define FILTER_WINDOW_SIZE 10
 
 MPU6050 mpu;
 
 #define OUTPUT_READABLE_ACCEL
 #define OUTPUT_READABLE_GYRO
 #define OUTPUT_READABLE_QUATERNION
-//#define OUTPUT_READABLE_EULER
-//#define OUTPUT_READABLE_YAWPITCHROLL
-#define OUTPUT_READABLE_REALACCEL
-//#define OUTPUT_READABLE_WORLDACCEL
 
 // MPU control/status vars
 bool	 dmpReady = false; // set true if DMP init was successful
@@ -38,14 +36,21 @@ uint16_t fifoCount;		   // count of all bytes currently in FIFO
 uint8_t	 fifoBuffer[64];   // FIFO storage buffer
 
 // orientation/motion vars
-Quaternion	q;		  // [w, x, y, z]         quaternion container
-VectorInt16 acc;	  // [x, y, z]            accel sensor measurements
-VectorInt16 gyr;	  // [x, y, z]            gyroscopy sensor measurements
-VectorInt16 accReal;  // [x, y, z]            gravity-free accel sensor measurements
-VectorInt16 accWorld; // [x, y, z]            world-frame accel sensor measurements
-VectorFloat gravity;  // [x, y, z]            gravity vector
-float		euler[3]; // [psi, theta, phi]    Euler angle container
-float		ypr[3];	  // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
+Quaternion	q;	 // [w, x, y, z]         quaternion container
+VectorInt16 acc; // [x, y, z]            accel sensor measurements
+VectorInt16 gyr; // [x, y, z]            gyroscopy sensor measurements
+
+// Vectors to hold the current and previous values
+std::vector<int16_t> accX;
+std::vector<int16_t> accY;
+std::vector<int16_t> accZ;
+std::vector<int16_t> gyrX;
+std::vector<int16_t> gyrY;
+std::vector<int16_t> gyrZ;
+std::vector<float>	 qW;
+std::vector<float>	 qX;
+std::vector<float>	 qY;
+std::vector<float>	 qZ;
 
 bool state = 0;
 
@@ -66,6 +71,25 @@ long		   proc_time;
 // ================================================================
 // ===                      INITIAL SETUP                       ===
 // ================================================================
+int16_t median_filter( std::vector<int16_t> &v, int16_t new_value ) {
+	v.push_back( new_value );
+	while( v.size() > FILTER_WINDOW_SIZE ) {
+		v.erase( v.begin() );
+	}
+	std::vector<int16_t> v_sorted = v;
+	std::sort( v_sorted.begin(), v_sorted.end() );
+	return v_sorted[v_sorted.size() / 2];
+}
+
+float median_filter( std::vector<float> &v, float new_value ) {
+	v.push_back( new_value );
+	while( v.size() > FILTER_WINDOW_SIZE ) {
+		v.erase( v.begin() );
+	}
+
+	std::sort( v.begin(), v.end() );
+	return v[v_sorted.size() / 2];
+}
 
 void setup() {
 	// initialize device
@@ -228,13 +252,24 @@ void loop() {
 		mpu.dmpGetGyro( &gyr, fifoBuffer );
 		mpu.dmpGetQuaternion( &q, fifoBuffer );
 
-		// Start of timing block
+		gettimeofday( &startt, NULL );
 		gettimeofday( &startt, NULL );
 
-		// compute Euler angles, etc.
-		mpu.dmpGetEuler( euler, &q );
+		// ======= ====== ======= Start of timing block  ======= ====== =======
 
-		// End of timing block
+		acc.x = median_filter( accX, acc.x );
+		acc.y = median_filter( accY, acc.y );
+		acc.z = median_filter( accZ, acc.z );
+		gyr.x = median_filter( gyrX, gyr.x );
+		gyr.y = median_filter( gyrY, gyr.y );
+		gyr.z = median_filter( gyrZ, gyr.z );
+		q.w	  = median_filter( qW, q.w );
+		q.x	  = median_filter( qX, q.x );
+		q.y	  = median_filter( qY, q.z );
+		q.z	  = median_filter( qZ, q.z );
+
+		// ======= ====== ======= End of timing block  ======= ====== =======
+
 		gettimeofday( &endt, NULL );
 		// proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000 + ( endt.tv_usec - startt.tv_usec ) / 1000.0 ) + 0.5;
 		// Get time in microseconds
