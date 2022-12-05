@@ -49,6 +49,9 @@ float		ypr[3];	  // [yaw, pitch, roll]   yaw/pitch/roll container and gravity ve
 
 bool state = 0;
 
+int fifo_rate = 1;
+int fps;
+
 #ifdef DMP_FIFO_RATE_DIVISOR
 int fifo_rate = DMP_FIFO_RATE_DIVISOR;
 #else
@@ -59,7 +62,7 @@ FILE *arq_Accel, *arq_Gyro, *arq_Quaternions, *arq_All, *arq_fps;
 
 std::string namepaste = "";
 
-struct timeval start, end, startc, endc, startb, endb, startd;
+struct timeval start, end, startc, endc, startb, endb, startd, endd;
 long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb, secondsd, usecondsd, timestartd;
 
 // ================================================================
