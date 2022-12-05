@@ -49,6 +49,12 @@ float		ypr[3];	  // [yaw, pitch, roll]   yaw/pitch/roll container and gravity ve
 
 bool state = 0;
 
+#ifdef DMP_FIFO_RATE_DIVISOR
+int fifo_rate = DMP_FIFO_RATE_DIVISOR;
+#else
+int fifo_rate = 0;
+#endif
+
 FILE *arq_Accel, *arq_Gyro, *arq_Quaternions, *arq_All;
 
 std::string namepaste = "";
@@ -80,7 +86,7 @@ void setup() {
 
 	// load and configure the DMP
 	printf( "Initializing DMP...\n" );
-	devStatus = mpu.dmpInitialize();
+	devStatus = mpu.dmpInitialize( fifo_rate );
 
 	mpu.setXAccelOffset( -4029 );
 	mpu.setYAccelOffset( 1758 );
@@ -247,6 +253,7 @@ int main( int argc, char **argv ) {
 
 		return 1;
 	}
+	int fifo_rate = atoi( argv[1] );
 	setup();
 	while( 1 ) {
 		loop();
