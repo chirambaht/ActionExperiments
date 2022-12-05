@@ -2152,7 +2152,7 @@ uint8_t MPU6050::dmpInitialize( uint8_t rate = MPU6050_DMP_FIFO_RATE_DIVISOR ) {
 	DEBUG_PRINTLN( F( "Success! DMP code written and verified." ) );
 
 	// Set the FIFO Rate Divisor int the DMP Firmware Memory
-	unsigned char dmpUpdate[] = { 0x00, MPU6050_DMP_FIFO_RATE_DIVISOR };
+	unsigned char dmpUpdate[] = { 0x00, rate };
 	writeMemoryBlock( dmpUpdate, 0x02, 0x02, 0x16 ); // Lets write the dmpUpdate data to the Firmware image, we have 2
 													 // bytes to write in bank 0x02 with the Offset 0x16
 

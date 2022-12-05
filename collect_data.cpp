@@ -154,7 +154,7 @@ void loop() {
 			digitalWrite( LED_RED, HIGH );
 		} else {
 			digitalWrite( LED_RED, LOW );
-			DIR			*d;
+			DIR *		   d;
 			struct dirent *dir;
 			d			= opendir( "Datas" );
 			int dir_len = 0;
@@ -253,7 +253,7 @@ int main( int argc, char **argv ) {
 
 		return 1;
 	}
-	int fifo_rate = atoi( argv[1] );
+	fifo_rate = atoi( argv[1] );
 	setup();
 	while( 1 ) {
 		loop();
