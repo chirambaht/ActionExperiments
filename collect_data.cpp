@@ -72,24 +72,56 @@ long		   proc_time;
 // ================================================================
 // ===                      INITIAL SETUP                       ===
 // ================================================================
-int16_t median_filter( std::vector<int16_t> &v, int16_t new_value ) {
-	v.push_back( new_value );
-	while( v.size() > FILTER_WINDOW_SIZE ) {
-		v.erase( v.begin() );
-	}
-	std::vector<int16_t> v_sorted = v;
-	std::sort( v_sorted.begin(), v_sorted.end() );
-	return v_sorted[v_sorted.size() / 2];
-}
 
-float median_filter( std::vector<float> &v, float new_value ) {
+// make a generic median filter
+template<typename T> T median_filter( std::vector<T> &v, T new_value ) {
 	v.push_back( new_value );
 	while( v.size() > FILTER_WINDOW_SIZE ) {
 		v.erase( v.begin() );
 	}
-	std::vector<float> v_sorted = v;
+	std::vector<T> v_sorted = v;
 	std::sort( v.begin(), v.end() );
 	return v[v_sorted.size() / 2];
+}
+
+// make a generic mean filter
+template<typename T> T mean_filter( std::vector<T> &v, T new_value ) {
+	v.push_back( new_value );
+	while( v.size() > FILTER_WINDOW_SIZE ) {
+		v.erase( v.begin() );
+	}
+	T sum = 0;
+	for( auto &i : v ) {
+		sum += i;
+	}
+	return sum / v.size();
+}
+
+// make a generic mode filter
+template<typename T> T mode_filter( std::vector<T> &v, T new_value ) {
+	v.push_back( new_value );
+	while( v.size() > FILTER_WINDOW_SIZE ) {
+		v.erase( v.begin() );
+	}
+	std::vector<T> v_sorted = v;
+	std::sort( v.begin(), v.end() );
+	T	mode		  = v[0];
+	int mode_count	  = 1;
+	T	current		  = v[0];
+	int current_count = 1;
+	for( int i = 1; i < v.size(); i++ ) {
+		if( v[i] == current ) {
+			current_count++;
+		} else {
+			if( current_count > mode_count ) {
+				mode	   = current;
+				mode_count = current_count;
+			}
+			current		  = v[i];
+			current_count = 1;
+		}
+	}
+	return mode;
 }
 
 void setup() {
@@ -218,7 +250,7 @@ void loop() {
 			fprintf( arq_All, "time,accx,accy,accz,gyrx,gyry,gyrz,qw,qx,qy,qz\n" );
 
 			arq_Timing = fopen( Data_Timing.c_str(), "wt" );
-			fprintf( arq_Timing, "time,proc\n" );
+			fprintf( arq_Timing, "time_msec,proc_usec\n" );
 
 			gettimeofday( &startc, NULL );
 		}
