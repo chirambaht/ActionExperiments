@@ -21,7 +21,7 @@
 #define BUTTON		  0
 #define INTERRUPT_PIN 27
 
-#define WAIT_TIME 10000
+#define WAIT_TIME 25000
 
 #define HARDWARE_INTERRUPT
 
@@ -40,16 +40,12 @@ int pps			= 0;
 int packetCount = 0;
 int lastUpdate	= 0;
 // orientation/motion vars
-Quaternion	q;		  // [w, x, y, z]         quaternion container
-VectorInt16 acc;	  // [x, y, z]            accel sensor measurements
-VectorInt16 gyr;	  // [x, y, z]            gyroscopy sensor measurements
-VectorInt16 accReal;  // [x, y, z]            gravity-free accel sensor measurements
-VectorInt16 accWorld; // [x, y, z]            world-frame accel sensor measurements
-VectorFloat gravity;  // [x, y, z]            gravity vector
-float		euler[3]; // [psi, theta, phi]    Euler angle container
-float		ypr[3];	  // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
-int			press_time = 0;
-bool		state	   = false;
+Quaternion	q;	 // [w, x, y, z]         quaternion container
+VectorInt16 acc; // [x, y, z]            accel sensor measurements
+VectorInt16 gyr; // [x, y, z]            gyroscopy sensor measurements
+
+int	 press_time = 0;
+bool state		= false;
 // packet structure for InvenSense teapot demo
 int			dmp_rate = 0;
 FILE	   *output_file;
@@ -85,14 +81,6 @@ void _get_dmp_data( void ) {
 	mpu.dmpGetGyro( &gyr, fifoBuffer );
 
 	// ======= ======= ======== The start of the processing block ======== =======
-	// Fix the accelerometer data
-	mpu.dmpGetGravity( &gravity, &q );
-	mpu.dmpGetLinearAccel( &accReal, &acc, &gravity );
-
-	// Fix the gyro data
-	gyr.x /= 16.4;
-	gyr.y /= 16.4;
-	gyr.z /= 16.4;
 
 	// ======= ======= ========  The end of the processing block  ======== =======
 
@@ -112,7 +100,7 @@ void _get_dmp_data( void ) {
 
 #ifdef HARDWARE_INTERRUPT
 	fprintf( output_file, "%ld, %7d, %7d, %7d, %7d, %7d, %7d, %7.5f, %7.5f, %7.5f, %7.5f\n", millis() - recording_start,
-		accReal.x, accReal.y, accReal.z, gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
+		acc.x, acc.y, acc.z, gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
 #endif
 	return;
 }
