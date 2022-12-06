@@ -186,9 +186,9 @@ void setup() {
 
 	// Start a new server
 	super_server = ActionTracer::Communication::Supervisor( 9022 );
-	super_server.initialize( false );
-	printf( "Waiting for client...\n" );
-	super_server.initialize( true );
+	// super_server.initialize( false );
+	// printf( "Waiting for client...\n" );
+	// super_server.initialize( true );
 }
 
 // ================================================================
@@ -223,7 +223,7 @@ void loop() {
 			digitalWrite( LED_RED, HIGH );
 		} else {
 			digitalWrite( LED_RED, LOW );
-			DIR *		   d;
+			DIR			*d;
 			struct dirent *dir;
 			d			= opendir( "Datas" );
 			int dir_len = 0;
@@ -315,7 +315,7 @@ void loop() {
 			dataPackage.data[9]							= gyr.z;
 			dataPackage.data[10]						= mtime;
 
-			super_server.send_packet();
+			// super_server.send_packet();
 
 			// ======= ====== ======= End of timing block  ======= ====== =======
 
