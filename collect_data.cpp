@@ -332,8 +332,8 @@ void loop() {
 			fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
 			fprintf( arq_All, "%ld,%6d,%6d,%6d,%6d,%6d,%6d,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, acc.x, acc.y, acc.z,
 				gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
-
-			fprintf( arq_Timing, "%ld,%ld,%ld\n", mtime, proc_time, p->ByteSize(); );
+			long l = p->ByteSizeLong();
+			fprintf( arq_Timing, "%ld,%ld,%ld\n", mtime, proc_time, l );
 		}
 	}
 }
