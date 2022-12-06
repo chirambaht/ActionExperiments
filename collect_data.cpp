@@ -332,10 +332,11 @@ void loop() {
 			// Get yaw, pitch and roll from the quaternion in degrees
 			// yaw	  = atan2( 2.0f * ( q.w * q.z + q.x * q.y ), 1.0f - 2.0f * ( q.y * q.y + q.z * q.z ) ) * 180.0f /
 			// M_PI; pitch = asin( 2.0f * ( q.w * q.y - q.z * q.x ) ) * 180.0f / M_PI;
-			roll = atan2( 2.0f * ( q.w * q.x + q.y * q.z ), 1.0f - 2.0f * ( q.x * q.x + q.y * q.y ) ) * 180.0f / M_PI;
+			uint16_t roll =
+				atan2( 2.0f * ( q.w * q.x + q.y * q.z ), 1.0f - 2.0f * ( q.x * q.x + q.y * q.y ) ) * 180.0f / M_PI;
 
 			if( roll > 40 ) {
-				blink_time();
+				blink();
 			}
 
 			// ======= ====== ======= End of timing block  ======= ====== =======
