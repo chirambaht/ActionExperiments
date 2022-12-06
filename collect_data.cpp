@@ -340,7 +340,7 @@ void loop() {
 			// if( roll > 40 ) {
 			// 	blink();
 			// }
-			send( file_descriptor, dataPackage.data, sizeof( dataPackage.data ), 0 );
+			send( descriptor, dataPackage.data, sizeof( dataPackage.data ), 0 );
 			// ======= ====== ======= End of timing block  ======= ====== =======
 
 			gettimeofday( &endt, NULL );
@@ -348,7 +348,7 @@ void loop() {
 			// 0.5; Get time in microseconds
 			super_server.load_packet( &dataPackage );
 
-			ActionTracer::ActionDataNetworkPackage *p = super_server.get_packet();
+			// ActionTracer::ActionDataNetworkPackage *p = super_server.get_packet();
 			proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000000 + ( endt.tv_usec - startt.tv_usec ) ) + 0.5;
 
 			fprintf( arq_Accel, "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
