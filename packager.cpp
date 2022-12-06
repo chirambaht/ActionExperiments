@@ -294,7 +294,7 @@ bool ActionTracer::Communication::Supervisor::get_ready() const { return _ready;
 
 bool ActionTracer::Communication::Supervisor::get_connected_clients() const { return _server.get_clients_connected(); }
 
-ActionTracer::ActionDataNetworkPackage ActionTracer::Communication::Supervisor::get_packet() const {
+ActionTracer::ActionDataNetworkPackage *ActionTracer::Communication::Supervisor::get_packet() const {
 	return &_net_package;
 }
 
