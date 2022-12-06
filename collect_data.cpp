@@ -1,5 +1,6 @@
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
+#include "packager.h"
 
 #include <algorithm>
 #include <dirent.h>
@@ -52,6 +53,8 @@ std::vector<float>	 qW;
 std::vector<float>	 qX;
 std::vector<float>	 qY;
 std::vector<float>	 qZ;
+
+ActionTracer::Communication::Supervisor super_server;
 
 bool state = 0;
 
@@ -179,6 +182,12 @@ void setup() {
 
 	gettimeofday( &start, NULL );
 	gettimeofday( &startc, NULL );
+
+	// Start a new server
+	super_server = ActionTracer::Communication::Supervisor( 9022 );
+	super_server.initialize( false );
+	printf( "Waiting for client...\n" );
+	super_server.initialize( true );
 }
 
 // ================================================================
@@ -290,16 +299,23 @@ void loop() {
 
 		// ======= ====== ======= Start of timing block  ======= ====== =======
 
-		acc.x = mode_filter( accX, acc.x );
-		acc.y = mode_filter( accY, acc.y );
-		acc.z = mode_filter( accZ, acc.z );
-		gyr.x = mode_filter( gyrX, gyr.x );
-		gyr.y = mode_filter( gyrY, gyr.y );
-		gyr.z = mode_filter( gyrZ, gyr.z );
-		q.w	  = mode_filter( qW, q.w );
-		q.x	  = mode_filter( qX, q.x );
-		q.y	  = mode_filter( qY, q.z );
-		q.z	  = mode_filter( qZ, q.z );
+		ActionTracer::ActionDataPackage dataPackage = ActionTracer::ActionDataPackage();
+		dataPackage.device_identifier_contents		= 0x0001;
+		dataPackage.data[0]							= q.w;
+		dataPackage.data[1]							= q.x;
+		dataPackage.data[2]							= q.y;
+		dataPackage.data[3]							= q.z;
+		dataPackage.data[4]							= acc.x;
+		dataPackage.data[5]							= acc.y;
+		dataPackage.data[6]							= acc.z;
+		dataPackage.data[7]							= gyr.x;
+		dataPackage.data[8]							= gyr.y;
+		dataPackage.data[9]							= gyr.z;
+		dataPackage.data[10]						= mtime;
+
+		super_server.load_packet( &dataPackage );
+
+		super_server.send_packet();
 
 		// ======= ====== ======= End of timing block  ======= ====== =======
 
