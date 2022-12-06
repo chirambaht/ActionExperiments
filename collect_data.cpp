@@ -4,6 +4,7 @@
 #include "packager.h"
 
 #include <algorithm>
+#include <chrono>
 #include <dirent.h>
 #include <filesystem>
 #include <iostream>
@@ -15,6 +16,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/timeb.h>
+#include <thread>
 #include <unistd.h>
 #include <vector>
 #include <wiringPi.h>
@@ -319,7 +321,7 @@ void loop() {
 		mpu.dmpGetQuaternion( &q, fifoBuffer );
 
 		if( state && !data_ready ) {
-			delay( 3 ); // Simuulate work done on collection data
+			std::this_thread::sleep_for( std::chrono::microseconds( 3500 ) ); // Simuulate work done on collection data
 			gettimeofday( &startt, NULL );
 			gettimeofday( &startt, NULL );
 			int descriptor = super_server.get_client_descriptor( 1 );
