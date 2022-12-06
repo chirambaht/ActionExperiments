@@ -340,7 +340,7 @@ void loop() {
 			dataPackage.data[10] = mtime;
 
 			// Send array of data to descriptor
-			data_ready = true;
+			// data_ready = true;
 
 			super_server.load_packet( &dataPackage );
 			super_server.send_packet();
