@@ -1,7 +1,7 @@
 all: collect_data IMU_zero
 
-HDRS = helper_3dmath.h I2Cdev.h MPU6050_6Axis_MotionApps20.h MPU6050.h
-CMN_OBJS = I2Cdev.o MPU6050.o
+HDRS = helper_3dmath.h I2Cdev.h MPU6050_6Axis_MotionApps20.h MPU6050.h debug_printer.h action_definitions.pb.h packager.h 
+CMN_OBJS = I2Cdev.o MPU6050.o action_definitions.pb.o packager.o
 CLD_OBJS = collect_data.o
 IMU_OBJS = IMU_zero.o
 
