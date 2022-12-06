@@ -342,10 +342,10 @@ void loop() {
 			dataPackage.data[10] = mtime;
 
 			// Send array of data to descriptor
-			// data_ready = true;
+			data_ready = true;
 
-			super_server.load_packet( &dataPackage );
-			super_server.send_packet();
+			// super_server.load_packet( &dataPackage );
+			// super_server.send_packet();
 			// ======= ====== ======= End of timing block  ======= ====== =======
 
 			gettimeofday( &endt, NULL );
@@ -388,11 +388,11 @@ int main( int argc, char **argv ) {
 	fifo_rate = atoi( argv[1] );
 	setup();
 
-	// if( piThreadCreate( send_it ) != 0 ) {
-	// 	printf( "Error creating thread\n" );
-	// 	return 1;
-	// }
-	// printf( "Thread created\n" );
+	if( piThreadCreate( send_it ) != 0 ) {
+		printf( "Error creating thread\n" );
+		return 1;
+	}
+	printf( "Thread created\n" );
 	while( 1 ) {
 		loop();
 	}
