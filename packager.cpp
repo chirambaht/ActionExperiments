@@ -292,11 +292,15 @@ void ActionTracer::Communication::Supervisor::set_ready( bool status ) { _ready 
  */
 bool ActionTracer::Communication::Supervisor::get_ready() const { return _ready; }
 
+ActionTracer::Communication::ActionServer *ActionTracer::Communication::Supervisor::get_ready() { return &_server; }
+
 bool ActionTracer::Communication::Supervisor::get_connected_clients() const { return _server.get_clients_connected(); }
 
 ActionTracer::ActionDataNetworkPackage *ActionTracer::Communication::Supervisor::get_packet() { return &_net_package; }
 
-ActionTracer::Communication::ActionServer *ActionTracer::Communication::Supervisor::get_server() { return &_server; }
+int ActionTracer::Communication::Supervisor::get_client_descriptor( int ref ) {
+	return _server.get_client_descriptor( ref );
+}
 
 /**
  * @brief Construct a new Action Tracer:: Communication:: Action Server:: Action Server object
@@ -380,6 +384,19 @@ void ActionTracer::Communication::ActionServer::set_port( const uint16_t port ) 
  * @returns int The descriptor of the server
  */
 uint8_t ActionTracer::Communication::ActionServer::get_descriptor() const { return _descriptor; }
+
+/**
+ * @brief Gets the descriptor of the server
+ * @returns int The descriptor of the server
+ */
+uint8_t ActionTracer::Communication::ActionServer::get_client_descriptor( int client_number ) const {
+	// If 0 return the server descriptor
+	if( client_number == 0 ) {
+		return _descriptor;
+	}
+	// return the client descriptor
+	return _clients[client_number - 1].get_descriptor();
+}
 
 /**
  * @brief Sets the descriptor of the server
@@ -467,8 +484,8 @@ int16_t ActionTracer::Communication::ActionServer::send_packet( ActionDataNetwor
  * @brief Send a packet to a client connected to the server
  * @param package A pointer to the data packet to send
  */
-int16_t ActionTracer::Communication::ActionServer::send_packet(
-	ActionDataNetworkPackage *package, ActionServerClient *client ) {
+int16_t ActionTracer::Communication::ActionServer::send_packet( ActionDataNetworkPackage *package,
+	ActionServerClient																   *client ) {
 	return client->send_packet( package, ActionCommand::DATA );
 }
 
@@ -539,8 +556,8 @@ void ActionTracer::Communication::ActionServerClient::set_descriptor( const int 
  * @brief Send a packet to the client via socket
  * @returns packet pointer to the packet to send
  */
-int16_t ActionTracer::Communication::ActionServerClient::send_packet(
-	ActionDataNetworkPackage *packet, ActionCommand command ) {
+int16_t ActionTracer::Communication::ActionServerClient::send_packet( ActionDataNetworkPackage *packet,
+	ActionCommand																				command ) {
 	if( !packet->IsInitialized() ) {
 		// throw std::invalid_argument( "Packet is not ready to be sent" );
 		return 0;
@@ -560,8 +577,8 @@ int16_t ActionTracer::Communication::ActionServerClient::send_packet(
 			}
 			printf( "Bad send\n" );
 			printf( "Error: %s\n", strerror( errno ) );
-			if( ( send_response = send(
-					  _descriptor, message->SerializeAsString().c_str(), message->ByteSizeLong(), 0 ) ) == -1 ) {
+			if( ( send_response = send( _descriptor, message->SerializeAsString().c_str(), message->ByteSizeLong(),
+					  0 ) ) == -1 ) {
 				if( send_response == -1 ) {
 					// Client disconnected
 					printf( "Client with descriptor %d is not responding, so I shall disconnect\n", get_descriptor() );

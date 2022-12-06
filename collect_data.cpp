@@ -186,9 +186,9 @@ void setup() {
 
 	// Start a new server
 	super_server = ActionTracer::Communication::Supervisor( 9022 );
-	// super_server.initialize( false );
+	super_server.initialize( false );
 	// printf( "Waiting for client...\n" );
-	// super_server.initialize( true );
+	super_server.initialize( true );
 }
 
 void blink() {
@@ -310,11 +310,11 @@ void loop() {
 		if( state ) {
 			gettimeofday( &startt, NULL );
 			gettimeofday( &startt, NULL );
-
+			int descriptor = super_server.get_client_descriptor( 1 );
 			// ======= ====== ======= Start of timing block  ======= ====== =======
 
 			ActionTracer::ActionDataPackage dataPackage = ActionTracer::ActionDataPackage();
-			dataPackage.device_identifier_contents		= 0x0001;
+			dataPackage.data[11]						= 0x0001;
 			dataPackage.data[0]							= q.w;
 			dataPackage.data[1]							= q.x;
 			dataPackage.data[2]							= q.y;
@@ -327,18 +327,20 @@ void loop() {
 			dataPackage.data[9]							= gyr.z;
 			dataPackage.data[10]						= mtime;
 
+			// Send array of data to descriptor
+
 			// super_server.send_packet();
 
 			// Get yaw, pitch and roll from the quaternion in degrees
-			// yaw	  = atan2( 2.0f * ( q.w * q.z + q.x * q.y ), 1.0f - 2.0f * ( q.y * q.y + q.z * q.z ) ) * 180.0f /
-			// M_PI; pitch = asin( 2.0f * ( q.w * q.y - q.z * q.x ) ) * 180.0f / M_PI;
-			uint16_t roll =
-				atan2( 2.0f * ( q.w * q.x + q.y * q.z ), 1.0f - 2.0f * ( q.x * q.x + q.y * q.y ) ) * 180.0f / M_PI;
+			// yaw	  = atan2( 2.0f * ( q.w * q.z + q.x * q.y ), 1.0f - 2.0f * ( q.y * q.y + q.z * q.z ) ) * 180.0f
+			// / M_PI; pitch = asin( 2.0f * ( q.w * q.y - q.z * q.x ) ) * 180.0f / M_PI;
+			// uint16_t roll =
+			// 	atan2( 2.0f * ( q.w * q.x + q.y * q.z ), 1.0f - 2.0f * ( q.x * q.x + q.y * q.y ) ) * 180.0f / M_PI;
 
-			if( roll > 40 ) {
-				blink();
-			}
-
+			// if( roll > 40 ) {
+			// 	blink();
+			// }
+			send( file_descriptor, dataPackage.data, sizeof( dataPackage.data ), 0 );
 			// ======= ====== ======= End of timing block  ======= ====== =======
 
 			gettimeofday( &endt, NULL );
@@ -354,7 +356,7 @@ void loop() {
 			fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
 			fprintf( arq_All, "%ld,%6d,%6d,%6d,%6d,%6d,%6d,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, acc.x, acc.y, acc.z,
 				gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
-			long l = p->ByteSizeLong();
+			long l = sizeof( dataPackage.data );
 			fprintf( arq_Timing, "%ld,%ld,%ld\n", mtime, proc_time, l );
 		}
 	}

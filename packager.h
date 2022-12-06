@@ -81,6 +81,7 @@ namespace ActionTracer::Communication {
 		void	 set_port( const uint16_t );
 
 		uint8_t get_descriptor() const;
+		uint8_t get_client_descriptor( int ) const;
 		void	set_descriptor( const int );
 
 		struct sockaddr_in get_details() const;
@@ -115,7 +116,7 @@ namespace ActionTracer::Communication {
 		~Supervisor();
 
 		void send_packet( void );
-		int	 send_packet( ActionDataPackage * );
+		int	 send_packet( ActionDataPackage	*);
 		void initialize();
 		void initialize( bool );
 
@@ -128,10 +129,11 @@ namespace ActionTracer::Communication {
 
 		void set_ready( bool );
 		bool get_ready() const;
+		int	 get_client_descriptor( int );
 
 		bool					  get_connected_clients() const;
 		ActionDataNetworkPackage *get_packet();
-		ActionServer *			  get_server();
+		ActionServer			 *get_server();
 
 		void	 set_server_port( uint16_t );
 		uint16_t get_server_port() const;
