@@ -55,6 +55,9 @@ std::vector<float>	 qX;
 std::vector<float>	 qY;
 std::vector<float>	 qZ;
 
+bool data_ready = false;
+
+ActionTracer::ActionDataPackage			dataPackage = ActionTracer::ActionDataPackage();
 ActionTracer::Communication::Supervisor super_server;
 
 bool state = 0;
@@ -126,6 +129,14 @@ template<typename T> T mode_filter( std::vector<T> &v, T new_value ) {
 		}
 	}
 	return mode;
+}
+
+PI_THREAD( send_it !) {
+	if( data_ready ) {
+		super_server.load_packet( &dataPackage );
+		super_server.send_packet();
+		data_ready = false;
+	}
 }
 
 void setup() {
@@ -307,40 +318,32 @@ void loop() {
 		mpu.dmpGetGyro( &gyr, fifoBuffer );
 		mpu.dmpGetQuaternion( &q, fifoBuffer );
 
-		if( state ) {
+		if( state && !data_ready ) {
+			delay( 3000 ); // Simuulate work done on collection data
 			gettimeofday( &startt, NULL );
 			gettimeofday( &startt, NULL );
 			int descriptor = super_server.get_client_descriptor( 1 );
+
 			// ======= ====== ======= Start of timing block  ======= ====== =======
 
-			ActionTracer::ActionDataPackage dataPackage = ActionTracer::ActionDataPackage();
-			dataPackage.data[11]						= 0x0001;
-			dataPackage.data[0]							= q.w;
-			dataPackage.data[1]							= q.x;
-			dataPackage.data[2]							= q.y;
-			dataPackage.data[3]							= q.z;
-			dataPackage.data[4]							= acc.x;
-			dataPackage.data[5]							= acc.y;
-			dataPackage.data[6]							= acc.z;
-			dataPackage.data[7]							= gyr.x;
-			dataPackage.data[8]							= gyr.y;
-			dataPackage.data[9]							= gyr.z;
-			dataPackage.data[10]						= mtime;
+			dataPackage.data[11] = 0x0001;
+			dataPackage.data[0]	 = q.w;
+			dataPackage.data[1]	 = q.x;
+			dataPackage.data[2]	 = q.y;
+			dataPackage.data[3]	 = q.z;
+			dataPackage.data[4]	 = acc.x;
+			dataPackage.data[5]	 = acc.y;
+			dataPackage.data[6]	 = acc.z;
+			dataPackage.data[7]	 = gyr.x;
+			dataPackage.data[8]	 = gyr.y;
+			dataPackage.data[9]	 = gyr.z;
+			dataPackage.data[10] = mtime;
 
 			// Send array of data to descriptor
+			data_ready = true;
 
-			// super_server.send_packet();
-
-			// Get yaw, pitch and roll from the quaternion in degrees
-			// yaw	  = atan2( 2.0f * ( q.w * q.z + q.x * q.y ), 1.0f - 2.0f * ( q.y * q.y + q.z * q.z ) ) * 180.0f
-			// / M_PI; pitch = asin( 2.0f * ( q.w * q.y - q.z * q.x ) ) * 180.0f / M_PI;
-			// uint16_t roll =
-			// 	atan2( 2.0f * ( q.w * q.x + q.y * q.z ), 1.0f - 2.0f * ( q.x * q.x + q.y * q.y ) ) * 180.0f / M_PI;
-
-			// if( roll > 40 ) {
-			// 	blink();
-			// }
-			send( descriptor, dataPackage.data, sizeof( dataPackage.data ), 0 );
+			super_server.load_packet( &dataPackage );
+			super_server.send_packet();
 			// ======= ====== ======= End of timing block  ======= ====== =======
 
 			gettimeofday( &endt, NULL );
@@ -356,8 +359,7 @@ void loop() {
 			fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
 			fprintf( arq_All, "%ld,%6d,%6d,%6d,%6d,%6d,%6d,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, acc.x, acc.y, acc.z,
 				gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
-			long l = sizeof( dataPackage.data );
-			fprintf( arq_Timing, "%ld,%ld,%ld\n", mtime, proc_time, l );
+			fprintf( arq_Timing, "%ld,%ld\n", mtime, proc_time );
 		}
 	}
 }
