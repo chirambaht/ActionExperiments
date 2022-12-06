@@ -71,7 +71,7 @@ std::string namepaste = "";
 
 struct timeval start, end, startc, endc, startb, endb, startt, endt;
 long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
-long		   proc_time;
+long		   proc_time, blink_time;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -189,6 +189,18 @@ void setup() {
 	// super_server.initialize( false );
 	// printf( "Waiting for client...\n" );
 	// super_server.initialize( true );
+}
+
+void blink() {
+	// get current time
+	long time = millis();
+	if( time - blink_time > 250 && state ) {
+		// get LED state
+		digitalWrite( LED_RED, !digitalRead( LED_RED ) );
+		digitalWrite( LED_GREEN, !digitalRead( LED_GREEN ) );
+		blink_time = time;
+	}
+	// allow change after 250ms
 }
 
 // ================================================================
@@ -316,6 +328,15 @@ void loop() {
 			dataPackage.data[10]						= mtime;
 
 			// super_server.send_packet();
+
+			// Get yaw, pitch and roll from the quaternion in degrees
+			// yaw	  = atan2( 2.0f * ( q.w * q.z + q.x * q.y ), 1.0f - 2.0f * ( q.y * q.y + q.z * q.z ) ) * 180.0f /
+			// M_PI; pitch = asin( 2.0f * ( q.w * q.y - q.z * q.x ) ) * 180.0f / M_PI;
+			roll = atan2( 2.0f * ( q.w * q.x + q.y * q.z ), 1.0f - 2.0f * ( q.x * q.x + q.y * q.y ) ) * 180.0f / M_PI;
+
+			if( roll > 40 ) {
+				blink_time();
+			}
 
 			// ======= ====== ======= End of timing block  ======= ====== =======
 
