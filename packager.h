@@ -115,7 +115,7 @@ namespace ActionTracer::Communication {
 		~Supervisor();
 
 		void send_packet( void );
-		int	 send_packet( ActionDataPackage	*);
+		int	 send_packet( ActionDataPackage * );
 		void initialize();
 		void initialize( bool );
 
@@ -129,8 +129,9 @@ namespace ActionTracer::Communication {
 		void set_ready( bool );
 		bool get_ready() const;
 
-		bool		  get_connected_clients() const;
-		ActionServer *get_server();
+		bool					  get_connected_clients() const;
+		ActionDataNetworkPackage *get_packet();
+		ActionServer *			  get_server();
 
 		void	 set_server_port( uint16_t );
 		uint16_t get_server_port() const;

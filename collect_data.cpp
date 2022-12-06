@@ -1,5 +1,6 @@
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
+#include "action_definitions.h"
 #include "packager.h"
 
 #include <algorithm>
@@ -294,44 +295,45 @@ void loop() {
 		mpu.dmpGetGyro( &gyr, fifoBuffer );
 		mpu.dmpGetQuaternion( &q, fifoBuffer );
 
-		gettimeofday( &startt, NULL );
-		gettimeofday( &startt, NULL );
-
-		// ======= ====== ======= Start of timing block  ======= ====== =======
-
-		ActionTracer::ActionDataPackage dataPackage = ActionTracer::ActionDataPackage();
-		dataPackage.device_identifier_contents		= 0x0001;
-		dataPackage.data[0]							= q.w;
-		dataPackage.data[1]							= q.x;
-		dataPackage.data[2]							= q.y;
-		dataPackage.data[3]							= q.z;
-		dataPackage.data[4]							= acc.x;
-		dataPackage.data[5]							= acc.y;
-		dataPackage.data[6]							= acc.z;
-		dataPackage.data[7]							= gyr.x;
-		dataPackage.data[8]							= gyr.y;
-		dataPackage.data[9]							= gyr.z;
-		dataPackage.data[10]						= mtime;
-
-		super_server.load_packet( &dataPackage );
-
-		super_server.send_packet();
-
-		// ======= ====== ======= End of timing block  ======= ====== =======
-
-		gettimeofday( &endt, NULL );
-		// proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000 + ( endt.tv_usec - startt.tv_usec ) / 1000.0 ) + 0.5;
-		// Get time in microseconds
-		proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000000 + ( endt.tv_usec - startt.tv_usec ) ) + 0.5;
-
 		if( state ) {
+			gettimeofday( &startt, NULL );
+			gettimeofday( &startt, NULL );
+
+			// ======= ====== ======= Start of timing block  ======= ====== =======
+
+			ActionTracer::ActionDataPackage dataPackage = ActionTracer::ActionDataPackage();
+			dataPackage.device_identifier_contents		= 0x0001;
+			dataPackage.data[0]							= q.w;
+			dataPackage.data[1]							= q.x;
+			dataPackage.data[2]							= q.y;
+			dataPackage.data[3]							= q.z;
+			dataPackage.data[4]							= acc.x;
+			dataPackage.data[5]							= acc.y;
+			dataPackage.data[6]							= acc.z;
+			dataPackage.data[7]							= gyr.x;
+			dataPackage.data[8]							= gyr.y;
+			dataPackage.data[9]							= gyr.z;
+			dataPackage.data[10]						= mtime;
+
+			super_server.send_packet();
+
+			// ======= ====== ======= End of timing block  ======= ====== =======
+
+			gettimeofday( &endt, NULL );
+			// proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000 + ( endt.tv_usec - startt.tv_usec ) / 1000.0 ) +
+			// 0.5; Get time in microseconds
+			ActionTracer::*p = super_server.load_packet( &dataPackage );
+
+			ActionTracer::ActionDataNetworkPackage *p = super_server.get_packet();
+			proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000000 + ( endt.tv_usec - startt.tv_usec ) ) + 0.5;
+
 			fprintf( arq_Accel, "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
 			fprintf( arq_Gyro, "%ld,%6d,%6d,%6d\n", mtime, gyr.x, gyr.y, gyr.z );
 			fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
 			fprintf( arq_All, "%ld,%6d,%6d,%6d,%6d,%6d,%6d,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, acc.x, acc.y, acc.z,
 				gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
 
-			fprintf( arq_Timing, "%ld,%ld\n", mtime, proc_time );
+			fprintf( arq_Timing, "%ld,%ld,%ld\n", mtime, proc_time, p->ByteSize(); );
 		}
 	}
 }

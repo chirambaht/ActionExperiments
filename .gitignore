@@ -2,3 +2,5 @@
 Data*/*
 .clang-format
 sequence_motor_driver*/*
+action_definitions.pb.cc
+action_definitions.pb.h
