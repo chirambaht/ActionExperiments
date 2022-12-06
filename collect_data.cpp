@@ -131,7 +131,7 @@ template<typename T> T mode_filter( std::vector<T> &v, T new_value ) {
 	return mode;
 }
 
-PI_THREAD( send_it !) {
+PI_THREAD( send_it ) {
 	if( data_ready ) {
 		super_server.load_packet( &dataPackage );
 		super_server.send_packet();
@@ -385,6 +385,12 @@ int main( int argc, char **argv ) {
 	}
 	fifo_rate = atoi( argv[1] );
 	setup();
+
+	// if( piThreadCreate( send_it ) != 0 ) {
+	// 	printf( "Error creating thread\n" );
+	// 	return 1;
+	// }
+	// printf( "Thread created\n" );
 	while( 1 ) {
 		loop();
 	}
