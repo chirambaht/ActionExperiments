@@ -322,7 +322,7 @@ void loop() {
 			gettimeofday( &endt, NULL );
 			// proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000 + ( endt.tv_usec - startt.tv_usec ) / 1000.0 ) +
 			// 0.5; Get time in microseconds
-			ActionTracer::*p = super_server.load_packet( &dataPackage );
+			super_server.load_packet( &dataPackage );
 
 			ActionTracer::ActionDataNetworkPackage *p = super_server.get_packet();
 			proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000000 + ( endt.tv_usec - startt.tv_usec ) ) + 0.5;
