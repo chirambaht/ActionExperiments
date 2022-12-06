@@ -292,8 +292,6 @@ void ActionTracer::Communication::Supervisor::set_ready( bool status ) { _ready 
  */
 bool ActionTracer::Communication::Supervisor::get_ready() const { return _ready; }
 
-ActionTracer::Communication::ActionServer *ActionTracer::Communication::Supervisor::get_ready() { return &_server; }
-
 bool ActionTracer::Communication::Supervisor::get_connected_clients() const { return _server.get_clients_connected(); }
 
 ActionTracer::ActionDataNetworkPackage *ActionTracer::Communication::Supervisor::get_packet() { return &_net_package; }
