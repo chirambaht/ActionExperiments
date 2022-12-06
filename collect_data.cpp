@@ -326,7 +326,7 @@ void loop() {
 			int descriptor = super_server.get_client_descriptor( 1 );
 
 			// ======= ====== ======= Start of timing block  ======= ====== =======
-			std::this_thread::sleep_for( std::chrono::microseconds( 3500 ) ); // Simuulate work done on collected data
+			std::this_thread::sleep_for( std::chrono::microseconds( 4500 ) ); // Simuulate work done on collected data
 
 			dataPackage.data[11] = 0x0001;
 			dataPackage.data[0]	 = q.w;
