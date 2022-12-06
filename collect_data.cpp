@@ -319,7 +319,7 @@ void loop() {
 		mpu.dmpGetQuaternion( &q, fifoBuffer );
 
 		if( state && !data_ready ) {
-			delay( 3000 ); // Simuulate work done on collection data
+			delay( 3 ); // Simuulate work done on collection data
 			gettimeofday( &startt, NULL );
 			gettimeofday( &startt, NULL );
 			int descriptor = super_server.get_client_descriptor( 1 );
