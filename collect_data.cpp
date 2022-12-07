@@ -322,15 +322,20 @@ void loop() {
 		mpu.dmpGetGyro( &gyr, fifoBuffer );
 		mpu.dmpGetQuaternion( &q, fifoBuffer );
 
+		fprintf( arq_Accel, "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
+		fprintf( arq_Gyro, "%ld,%6d,%6d,%6d\n", mtime, gyr.x, gyr.y, gyr.z );
+		fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
+		fprintf( arq_All, "%ld,%6d,%6d,%6d,%6d,%6d,%6d,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, acc.x, acc.y, acc.z, gyr.x,
+			gyr.y, gyr.z, q.w, q.x, q.y, q.z );
+
 		if( state && !data_ready ) {
 			gettimeofday( &startt, NULL );
 			gettimeofday( &startt, NULL );
-			int descriptor = super_server.get_client_descriptor( 1 );
+			// int descriptor = super_server.get_client_descriptor( 1 );
 
 			// ======= ====== ======= Start of timing block  ======= ====== =======
 			std::this_thread::sleep_for( std::chrono::microseconds( 4500 ) ); // Simuulate work done on collected data
 
-			dataPackage.data[11] = 0x0001;
 			dataPackage.data[0]	 = q.w;
 			dataPackage.data[1]	 = q.x;
 			dataPackage.data[2]	 = q.y;
@@ -355,11 +360,6 @@ void loop() {
 			// ActionTracer::ActionDataNetworkPackage *p = super_server.get_packet();
 			proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000000 + ( endt.tv_usec - startt.tv_usec ) ) + 0.5;
 
-			fprintf( arq_Accel, "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
-			fprintf( arq_Gyro, "%ld,%6d,%6d,%6d\n", mtime, gyr.x, gyr.y, gyr.z );
-			fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
-			fprintf( arq_All, "%ld,%6d,%6d,%6d,%6d,%6d,%6d,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, acc.x, acc.y, acc.z,
-				gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
 			fprintf( arq_Timing, "%ld,%ld\n", mtime, proc_time );
 		}
 	}
