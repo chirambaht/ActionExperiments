@@ -134,16 +134,19 @@ template<typename T> T mode_filter( std::vector<T> &v, T new_value ) {
 }
 
 PI_THREAD( send_it ) {
-	while( true ) {
-		if( data_ready ) {
-			piLock( 1 );
-			super_server.load_packet( &dataPackage );
-			super_server.send_packet();
-
-			data_ready = false;
-			printf( "Data sent\n" );
-			piUnlock( 1 );
+	for( ;; ) {
+		while( !data_ready ) {
+			continue;
 		}
+		printf( "Sending data\n" );
+
+		piLock( 1 );
+		super_server.load_packet( &dataPackage );
+		super_server.send_packet();
+
+		data_ready = false;
+		printf( "Data sent\n" );
+		piUnlock( 1 );
 	}
 }
 
