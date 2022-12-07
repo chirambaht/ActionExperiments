@@ -141,6 +141,7 @@ PI_THREAD( send_it ) {
 			super_server.send_packet();
 
 			data_ready = false;
+			printf( "Data sent\n" );
 			piUnlock( 1 );
 		}
 	}
@@ -355,7 +356,7 @@ void loop() {
 
 			gettimeofday( &endt, NULL );
 			piLock( 1 );
-			delay( 1 );
+			printf( "Data ready\n" );
 			data_ready = true;
 			piUnlock( 1 );
 			// ActionTracer::ActionDataNetworkPackage *p = super_server.get_packet();
