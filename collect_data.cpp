@@ -78,6 +78,8 @@ struct timeval start, end, startc, endc, startb, endb, startt, endt;
 long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
 long		   proc_time, blink_time;
 
+std::thread comms;
+
 // ================================================================
 // ===                      INITIAL SETUP                       ===
 // ================================================================
@@ -147,6 +149,21 @@ PI_THREAD( send_it ) {
 		data_ready = false;
 		printf( "Data sent\n" );
 		piUnlock( 1 );
+	}
+}
+
+void trans_thread( bool *dat ) {
+	for( ;; ) {
+		while( !*dat ) {
+			continue;
+		}
+		printf( "Sending data\n" );
+
+		super_server.load_packet( &dataPackage );
+		super_server.send_packet();
+
+		*dat = false;
+		printf( "Data sent\n" );
 	}
 }
 
@@ -358,10 +375,8 @@ void loop() {
 			// ======= ====== ======= End of timing block  ======= ====== =======
 
 			gettimeofday( &endt, NULL );
-			piLock( 1 );
 			printf( "Data ready\n" );
 			data_ready = true;
-			piUnlock( 1 );
 			// ActionTracer::ActionDataNetworkPackage *p = super_server.get_packet();
 			proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000000 + ( endt.tv_usec - startt.tv_usec ) ) + 0.5;
 
@@ -392,10 +407,12 @@ int main( int argc, char **argv ) {
 	fifo_rate = atoi( argv[1] );
 	setup();
 
-	if( piThreadCreate( send_it ) != 0 ) {
-		printf( "Error creating thread\n" );
-		return 1;
-	}
+	// if( piThreadCreate( send_it ) != 0 ) {
+	// 	printf( "Error creating thread\n" );
+	// 	return 1;
+	// }
+
+	comms = std::thread( this, &trans_thread, &data_ready );
 	printf( "Thread created\n" );
 	while( 1 ) {
 		loop();
