@@ -352,16 +352,15 @@ void loop() {
 			dataPackage.data[10] = mtime;
 
 			// Send array of data to descriptor
-			piLock( 1 );
-			data_ready = true;
-			piUnlock( 1 );
 
 			// super_server.load_packet( &dataPackage );
 			// super_server.send_packet();
 			// ======= ====== ======= End of timing block  ======= ====== =======
 
 			gettimeofday( &endt, NULL );
-
+			piLock( 1 );
+			data_ready = true;
+			piUnlock( 1 );
 			// ActionTracer::ActionDataNetworkPackage *p = super_server.get_packet();
 			proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000000 + ( endt.tv_usec - startt.tv_usec ) ) + 0.5;
 
