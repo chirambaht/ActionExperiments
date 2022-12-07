@@ -16,7 +16,7 @@ CXXFLAGS = -DDMP_FIFO_RATE=1 -Wall -g -O2 `pkg-config gtkmm-3.0 --cflags --libs`
 $(CMN_OBJS) $(CLD_OBJS) $(IMU_OBJS): $(HDRS)
 
 collect_data: $(CMN_OBJS) $(CLD_OBJS)
-	$(CXX) -o $@ $^ -l wiringPi -lprotobuf -lm
+	$(CXX) -o $@ $^ -l wiringPi -lprotobuf -lm -lpthread
 
 IMU_zero: $(CMN_OBJS) $(IMU_OBJS)
 	$(CXX) -o $@ $^ -lm -lprotobuf
