@@ -405,7 +405,7 @@ int main( int argc, char **argv ) {
 	// 	return 1;
 	// }
 
-	std::thread( &trans_thread, &data_ready );
+	// std::thread( &trans_thread, &data_ready );
 	printf( "Thread created\n" );
 	while( 1 ) {
 		loop();
