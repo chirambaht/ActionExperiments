@@ -152,19 +152,9 @@ PI_THREAD( send_it ) {
 	}
 }
 
-void trans_thread( bool *dat ) {
-	for( ;; ) {
-		while( !*dat ) {
-			continue;
-		}
-		printf( "Sending data\n" );
-
-		super_server.load_packet( &dataPackage );
-		super_server.send_packet();
-
-		*dat = false;
-		printf( "Data sent\n" );
-	}
+void trans_thread() {
+	super_server.load_packet( &dataPackage );
+	super_server.send_packet();
 }
 
 void setup() {
@@ -372,11 +362,14 @@ void loop() {
 
 			// super_server.load_packet( &dataPackage );
 			// super_server.send_packet();
+			std::thread send_it = std::thread( &trans_thread );
+			send_it.detach();
+
 			// ======= ====== ======= End of timing block  ======= ====== =======
 
 			gettimeofday( &endt, NULL );
 			printf( "Data ready\n" );
-			data_ready = true;
+			// data_ready = true;
 			// ActionTracer::ActionDataNetworkPackage *p = super_server.get_packet();
 			proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000000 + ( endt.tv_usec - startt.tv_usec ) ) + 0.5;
 
@@ -412,7 +405,7 @@ int main( int argc, char **argv ) {
 	// 	return 1;
 	// }
 
-	comms = std::thread( &trans_thread, &data_ready );
+	std::thread( &trans_thread, &data_ready );
 	printf( "Thread created\n" );
 	while( 1 ) {
 		loop();
