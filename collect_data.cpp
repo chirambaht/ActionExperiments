@@ -322,13 +322,12 @@ void loop() {
 		mpu.dmpGetGyro( &gyr, fifoBuffer );
 		mpu.dmpGetQuaternion( &q, fifoBuffer );
 
-		fprintf( arq_Accel, "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
-		fprintf( arq_Gyro, "%ld,%6d,%6d,%6d\n", mtime, gyr.x, gyr.y, gyr.z );
-		fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
-		fprintf( arq_All, "%ld,%6d,%6d,%6d,%6d,%6d,%6d,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, acc.x, acc.y, acc.z, gyr.x,
-			gyr.y, gyr.z, q.w, q.x, q.y, q.z );
-
 		if( state && !data_ready ) {
+			fprintf( arq_Accel, "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
+			fprintf( arq_Gyro, "%ld,%6d,%6d,%6d\n", mtime, gyr.x, gyr.y, gyr.z );
+			fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
+			fprintf( arq_All, "%ld,%6d,%6d,%6d,%6d,%6d,%6d,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, acc.x, acc.y, acc.z,
+				gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
 			gettimeofday( &startt, NULL );
 			gettimeofday( &startt, NULL );
 			// int descriptor = super_server.get_client_descriptor( 1 );
