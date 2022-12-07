@@ -315,10 +315,7 @@ void loop() {
 		// read a packet from FIFO
 		mpu.getFIFOBytes( fifoBuffer, packetSize );
 		// get the time to create the millis function
-		gettimeofday( &endc, NULL );
-		seconds	 = endc.tv_sec - startc.tv_sec;
-		useconds = endc.tv_usec - startc.tv_usec;
-		mtime	 = ( ( seconds ) *1000 + useconds / 1000.0 ) + 0.5;
+		mtime = millis();
 		// display time in milliseconds
 
 		mpu.dmpGetAccel( &acc, fifoBuffer );

@@ -26,4 +26,4 @@ clean:
 
 gui_actish_debug:
 	@ echo "http://$(LOCAL_IP):$(LOCAL_PORT)"
-	@ gdbgui collect_data --host $(LOCAL_IP)  --port $(LOCAL_PORT)
+	@ gdbgui --host $(LOCAL_IP)  --port $(LOCAL_PORT) --args collect_data 0
