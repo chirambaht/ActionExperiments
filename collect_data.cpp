@@ -360,10 +360,10 @@ void loop() {
 
 			// Send array of data to descriptor
 
-			// super_server.load_packet( &dataPackage );
-			// super_server.send_packet();
-			std::thread send_it = std::thread( &trans_thread );
-			send_it.detach();
+			super_server.load_packet( &dataPackage );
+			super_server.send_packet();
+			// std::thread send_it = std::thread( &trans_thread );
+			// send_it.detach();
 
 			// ======= ====== ======= End of timing block  ======= ====== =======
 
