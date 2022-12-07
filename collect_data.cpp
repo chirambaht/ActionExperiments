@@ -138,7 +138,10 @@ PI_THREAD( send_it ) {
 		if( data_ready ) {
 			super_server.load_packet( &dataPackage );
 			super_server.send_packet();
+
+			piLock( 1 );
 			data_ready = false;
+			piUnlock( 1 );
 		}
 	}
 }
@@ -349,7 +352,9 @@ void loop() {
 			dataPackage.data[10] = mtime;
 
 			// Send array of data to descriptor
+			piLock( 1 );
 			data_ready = true;
+			piUnlock( 1 );
 
 			// super_server.load_packet( &dataPackage );
 			// super_server.send_packet();
