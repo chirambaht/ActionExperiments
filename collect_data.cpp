@@ -412,7 +412,7 @@ int main( int argc, char **argv ) {
 	// 	return 1;
 	// }
 
-	comms = std::thread( this, &trans_thread, &data_ready );
+	comms = std::thread( &trans_thread, &data_ready );
 	printf( "Thread created\n" );
 	while( 1 ) {
 		loop();
