@@ -8,7 +8,10 @@ IMU_OBJS = IMU_zero.o
 # Set DMP FIFO rate to 100Hz.  See comments in
 # MPU6050_6Axis_MotionApps20.h for details.
 
-CXXFLAGS = -DDMP_FIFO_RATE=1 -Wall -O2 `pkg-config gtkmm-3.0 --cflags --libs`
+LOCAL_IP = $(shell ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' | awk '{print $1}')
+LOCAL_PORT = 5000
+
+CXXFLAGS = -DDMP_FIFO_RATE=1 -Wall -g -O2 `pkg-config gtkmm-3.0 --cflags --libs`
 
 $(CMN_OBJS) $(CLD_OBJS) $(IMU_OBJS): $(HDRS)
 
@@ -21,3 +24,6 @@ IMU_zero: $(CMN_OBJS) $(IMU_OBJS)
 clean:
 	rm -f $(CMN_OBJS) $(CLD_OBJS) $(IMU_OBJS) collect_data IMU_zero
 
+gui_actish_debug:
+	@ echo "http://$(LOCAL_IP):$(LOCAL_PORT)"
+	@ gdbgui collect_data --host $(LOCAL_IP)  --port $(LOCAL_PORT)
