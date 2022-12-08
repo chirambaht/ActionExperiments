@@ -63,8 +63,8 @@ bool data_ready = false;
 ActionTracer::ActionDataPackage			dataPackage = ActionTracer::ActionDataPackage();
 ActionTracer::Communication::Supervisor super_server;
 
-bool state = 0;
-
+bool		state	  = 0;
+std::string test_name = "";
 #ifdef DMP_FIFO_RATE_DIVISOR
 int fifo_rate = DMP_FIFO_RATE_DIVISOR;
 #else
@@ -259,17 +259,19 @@ void blink() {
 // ================================================================
 // ===                    MAIN PROGRAM LOOP                     ===
 // ================================================================
-
+bool go = false;
 void loop() {
 	gettimeofday( &end, NULL );
 	seconds	  = end.tv_sec - start.tv_sec;
 	useconds  = end.tv_usec - start.tv_usec;
 	timestart = ( ( seconds ) *1000 + useconds / 1000.0 ) + 0.5;
 
-	if( timestart > 25000 )
+	if( timestart > 25000 ) {
 		digitalWrite( LED_GREEN, HIGH );
+		go = true;
+	}
 
-	if( digitalRead( BUTTON ) == true && timestart > 25000 ) {
+	if( go || ( digitalRead( BUTTON ) == true && timestart > 25000 ) ) {
 		gettimeofday( &startb, NULL );
 
 		while( digitalRead( BUTTON ) ) {
@@ -308,9 +310,11 @@ void loop() {
 			stat( existing_dir.c_str(), &atributes );
 			mkdir( new_dir.c_str(), atributes.st_mode );
 
-			std::string Data_Accel = namepaste + "/Data_Accel.csv", Data_Gyro = namepaste + "/Data_Gyro.csv",
-						Data_Quaternions = namepaste + "/Data_Quaternions.csv", Data_All = namepaste + "/Data_All.csv",
-						Data_Timing = namepaste + "/Data_Timing.csv";
+			std::string Data_Accel		 = namepaste + "/Data_Accel_" + test_name + ".csv",
+						Data_Gyro		 = namepaste + "/Data_Gyro_" + test_name + ".csv",
+						Data_Quaternions = namepaste + "/Data_Quaternions_" + test_name + ".csv",
+						Data_All		 = namepaste + "/Data_All_" + test_name + ".csv",
+						Data_Timing		 = namepaste + "/Data_Timing_" + test_name + ".csv";
 
 			arq_Accel = fopen( Data_Accel.c_str(), "wt" );
 			fprintf( arq_Accel, "time,accx,accy,accz\n" );
@@ -416,6 +420,8 @@ int main( int argc, char **argv ) {
 	}
 	fifo_rate	= atoi( argv[1] );
 	window_size = atoi( argv[3] );
+
+	test_name = argv[2] + "_" + argv[3];
 
 	if( strcmp( argv[2], "median" ) == 0 ) {
 		filter = &median_filter;
