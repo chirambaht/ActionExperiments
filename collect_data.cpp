@@ -40,6 +40,7 @@ uint16_t packetSize;	   // expected DMP packet size (default is 42 bytes)
 uint16_t fifoCount;		   // count of all bytes currently in FIFO
 uint8_t	 fifoBuffer[64];   // FIFO storage buffer
 
+int window_size = FILTER_WINDOW_SIZE;
 // orientation/motion vars
 Quaternion	q;	 // [w, x, y, z]         quaternion container
 VectorInt16 acc; // [x, y, z]            accel sensor measurements
@@ -156,6 +157,9 @@ void trans_thread() {
 	super_server.load_packet( &dataPackage );
 	super_server.send_packet();
 }
+
+// Blank function variable
+void ( *filter )( std::vector<T> &, T ) = nullptr;
 
 void setup() {
 	// initialize device
@@ -334,40 +338,31 @@ void loop() {
 		mpu.dmpGetQuaternion( &q, fifoBuffer );
 
 		if( state && !data_ready ) {
+			// gettimeofday( &startt, NULL );
+			gettimeofday( &startt, NULL );
+			// int descriptor = super_server.get_client_descriptor( 1 );
+
+			// ======= ====== ======= Start of timing block  ======= ====== =======
+			acc.x = filter( accX, acc.x );
+			acc.y = filter( accY, acc.y );
+			acc.z = filter( accZ, acc.z );
+
+			gyr.x = filter( gyrX, gyr.x );
+			gyr.y = filter( gyrY, gyr.y );
+			gyr.z = filter( gyrZ, gyr.z );
+
+			q.w = filter( qW, q.w );
+			q.x = filter( qX, q.x );
+			q.y = filter( qY, q.y );
+			q.z = filter( qZ, q.z );
+			// ======= ====== ======= End of timing block  ======= ====== =======
+
+			gettimeofday( &endt, NULL );
 			fprintf( arq_Accel, "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
 			fprintf( arq_Gyro, "%ld,%6d,%6d,%6d\n", mtime, gyr.x, gyr.y, gyr.z );
 			fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
 			fprintf( arq_All, "%ld,%6d,%6d,%6d,%6d,%6d,%6d,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, acc.x, acc.y, acc.z,
 				gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
-			gettimeofday( &startt, NULL );
-			gettimeofday( &startt, NULL );
-			// int descriptor = super_server.get_client_descriptor( 1 );
-
-			// ======= ====== ======= Start of timing block  ======= ====== =======
-			std::this_thread::sleep_for( std::chrono::microseconds( 4500 ) ); // Simuulate work done on collected data
-
-			dataPackage.data[0]	 = q.w;
-			dataPackage.data[1]	 = q.x;
-			dataPackage.data[2]	 = q.y;
-			dataPackage.data[3]	 = q.z;
-			dataPackage.data[4]	 = acc.x;
-			dataPackage.data[5]	 = acc.y;
-			dataPackage.data[6]	 = acc.z;
-			dataPackage.data[7]	 = gyr.x;
-			dataPackage.data[8]	 = gyr.y;
-			dataPackage.data[9]	 = gyr.z;
-			dataPackage.data[10] = mtime;
-
-			// Send array of data to descriptor
-
-			super_server.load_packet( &dataPackage );
-			super_server.send_packet();
-			// std::thread send_it = std::thread( &trans_thread );
-			// send_it.detach();
-
-			// ======= ====== ======= End of timing block  ======= ====== =======
-
-			gettimeofday( &endt, NULL );
 			// printf( "Data ready\n" );
 			// data_ready = true;
 			// ActionTracer::ActionDataNetworkPackage *p = super_server.get_packet();
@@ -379,8 +374,10 @@ void loop() {
 }
 
 int main( int argc, char **argv ) {
-	if( argc < 2 ) {
-		printf( "Usage: %s <rate>\n", argv[0] );
+	if( argc < 4 ) {
+		printf( "Usage: %s <rate> <filter> <window_size>\n", argv[0] );
+		printf( "Filter: mode median mean\n" );
+		printf( "Window_size: 0 - 1024\n" );
 		printf( "Output data rate is calculated as: 200/(rate+1)\n\n" );
 		printf( " Output Rate  |  Rate\n" );
 		printf( "--------------+-------\n" );
@@ -397,7 +394,19 @@ int main( int argc, char **argv ) {
 
 		return 1;
 	}
-	fifo_rate = atoi( argv[1] );
+	fifo_rate	= atoi( argv[1] );
+	window_size = atoi( argv[3] );
+
+	if( strcmp( argv[2], "median" ) == 0 ) {
+		filter = &median_filter;
+	} else if( strcmp( argv[2], "mean" ) == 0 ) {
+		filter = &mean_filter;
+	} else if( strcmp( argv[2], "mode" ) == 0 ) {
+		filter = &mode_filter;
+	} else {
+		printf( "Invalid filter mode\n" );
+		return 1;
+	}
 	setup();
 
 	// if( piThreadCreate( send_it ) != 0 ) {
@@ -406,7 +415,7 @@ int main( int argc, char **argv ) {
 	// }
 
 	// std::thread( &trans_thread, &data_ready );
-	printf( "Thread created\n" );
+	// printf( "Thread created\n" );
 	while( 1 ) {
 		loop();
 	}
