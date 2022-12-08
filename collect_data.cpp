@@ -159,7 +159,7 @@ void trans_thread() {
 }
 
 // Blank function variable
-void ( *filter )( std::vector<T> &, T ) = nullptr;
+template<typename T> T ( *filter )( std::vector<T> &, T ) = nullptr;
 
 void setup() {
 	// initialize device
