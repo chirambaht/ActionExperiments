@@ -117,10 +117,10 @@ float mode_filter( std::vector<float> &v, float new_value ) {
 	}
 	std::vector<float> v_sorted = v;
 	std::sort( v.begin(), v.end() );
-	T	mode		  = v[0];
-	int mode_count	  = 1;
-	T	current		  = v[0];
-	int current_count = 1;
+	float mode			= v[0];
+	int	  mode_count	= 1;
+	float current		= v[0];
+	int	  current_count = 1;
 	for( int i = 1; i < v.size(); i++ ) {
 		if( v[i] == current ) {
 			current_count++;
