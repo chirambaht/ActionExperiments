@@ -239,9 +239,9 @@ void setup() {
 
 	// Start a new server
 	super_server = ActionTracer::Communication::Supervisor( 9022 );
-	super_server.initialize( false );
-	// printf( "Waiting for client...\n" );
-	super_server.initialize( true );
+	// super_server.initialize( false );
+	// // printf( "Waiting for client...\n" );
+	// super_server.initialize( true );
 }
 
 void blink() {
@@ -271,7 +271,9 @@ void loop() {
 
 	if( timestart > 25000 ) {
 		digitalWrite( LED_GREEN, HIGH );
-		go = true;
+		if( state == false ) {
+			go = true;
+		}
 	}
 
 	if( go || ( digitalRead( BUTTON ) == true && timestart > 25000 ) ) {
