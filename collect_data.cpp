@@ -47,16 +47,16 @@ VectorInt16 acc; // [x, y, z]            accel sensor measurements
 VectorInt16 gyr; // [x, y, z]            gyroscopy sensor measurements
 
 // Vectors to hold the current and previous values
-std::vector<int16_t> accX;
-std::vector<int16_t> accY;
-std::vector<int16_t> accZ;
-std::vector<int16_t> gyrX;
-std::vector<int16_t> gyrY;
-std::vector<int16_t> gyrZ;
-std::vector<float>	 qW;
-std::vector<float>	 qX;
-std::vector<float>	 qY;
-std::vector<float>	 qZ;
+std::vector<float> accX;
+std::vector<float> accY;
+std::vector<float> accZ;
+std::vector<float> gyrX;
+std::vector<float> gyrY;
+std::vector<float> gyrZ;
+std::vector<float> qW;
+std::vector<float> qX;
+std::vector<float> qY;
+std::vector<float> qZ;
 
 bool data_ready = false;
 
@@ -86,7 +86,7 @@ std::thread comms;
 // ================================================================
 
 // make a generic median filter
-template<typename T> T median_filter( std::vector<T> &v, T new_value ) {
+float median_filter( std::vector<float> &v, float new_value ) {
 	v.push_back( new_value );
 	while( v.size() > FILTER_WINDOW_SIZE ) {
 		v.erase( v.begin() );
@@ -97,7 +97,7 @@ template<typename T> T median_filter( std::vector<T> &v, T new_value ) {
 }
 
 // make a generic mean filter
-template<typename T> T mean_filter( std::vector<T> &v, T new_value ) {
+float mean_filter( std::vector<float> &v, float new_value ) {
 	v.push_back( new_value );
 	while( v.size() > FILTER_WINDOW_SIZE ) {
 		v.erase( v.begin() );
@@ -110,7 +110,7 @@ template<typename T> T mean_filter( std::vector<T> &v, T new_value ) {
 }
 
 // make a generic mode filter
-template<typename T> T mode_filter( std::vector<T> &v, T new_value ) {
+float mode_filter( std::vector<float> &v, float new_value ) {
 	v.push_back( new_value );
 	while( v.size() > FILTER_WINDOW_SIZE ) {
 		v.erase( v.begin() );
@@ -159,7 +159,8 @@ void trans_thread() {
 }
 
 // Blank function variable
-template<typename T> T ( *filter )( std::vector<T> &, T ) = nullptr;
+// template<typename T> T ( *filter )( std::vector<T> &, T );
+float ( *filter )( std::vector<float> &, float );
 
 void setup() {
 	// initialize device
@@ -343,13 +344,13 @@ void loop() {
 			// int descriptor = super_server.get_client_descriptor( 1 );
 
 			// ======= ====== ======= Start of timing block  ======= ====== =======
-			acc.x = filter( accX, acc.x );
-			acc.y = filter( accY, acc.y );
-			acc.z = filter( accZ, acc.z );
+			acc.x = ( int16_t ) filter( accX, acc.x );
+			acc.y = ( int16_t ) filter( accY, acc.y );
+			acc.z = ( int16_t ) filter( accZ, acc.z );
 
-			gyr.x = filter( gyrX, gyr.x );
-			gyr.y = filter( gyrY, gyr.y );
-			gyr.z = filter( gyrZ, gyr.z );
+			gyr.x = ( int16_t ) filter( gyrX, gyr.x );
+			gyr.y = ( int16_t ) filter( gyrY, gyr.y );
+			gyr.z = ( int16_t ) filter( gyrZ, gyr.z );
 
 			q.w = filter( qW, q.w );
 			q.x = filter( qX, q.x );
