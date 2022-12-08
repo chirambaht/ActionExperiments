@@ -58,7 +58,8 @@ std::vector<float> qX;
 std::vector<float> qY;
 std::vector<float> qZ;
 
-bool data_ready = false;
+bool data_ready	 = false;
+int	 num_devices = 1;
 
 ActionTracer::ActionDataPackage			dataPackage = ActionTracer::ActionDataPackage();
 ActionTracer::Communication::Supervisor super_server;
@@ -75,9 +76,9 @@ FILE *arq_Accel, *arq_Gyro, *arq_Quaternions, *arq_All, *arq_Timing;
 
 std::string namepaste = "";
 
-struct timeval start, end, startc, endc, startb, endb, startt, endt;
+struct timeval start, end, startc, endc, startb, endb, startt, endt, startc, endc;
 long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
-long		   proc_time, blink_time;
+long		   proc_time, blink_time, coll_time;
 
 std::thread comms;
 uint32_t	packs	   = 0;
@@ -298,7 +299,7 @@ void loop() {
 			digitalWrite( LED_RED, HIGH );
 		} else {
 			digitalWrite( LED_RED, LOW );
-			DIR			*d;
+			DIR *		   d;
 			struct dirent *dir;
 			d			= opendir( "Datas" );
 			int dir_len = 0;
@@ -337,7 +338,7 @@ void loop() {
 			fprintf( arq_All, "time,accx,accy,accz,gyrx,gyry,gyrz,qw,qx,qy,qz\n" );
 
 			arq_Timing = fopen( Data_Timing.c_str(), "wt" );
-			fprintf( arq_Timing, "time_msec,proc_usec\n" );
+			fprintf( arq_Timing, "time_msec,coll_usec\n" );
 
 			gettimeofday( &startc, NULL );
 		}
@@ -360,14 +361,19 @@ void loop() {
 		if( state )
 			digitalWrite( LED_GREEN, LOW );
 		// read a packet from FIFO
+		gettimeofday( &startc, NULL );
 		mpu.getFIFOBytes( fifoBuffer, packetSize );
 		// get the time to create the millis function
+
 		mtime = millis();
+
 		// display time in milliseconds
 
 		mpu.dmpGetAccel( &acc, fifoBuffer );
 		mpu.dmpGetGyro( &gyr, fifoBuffer );
 		mpu.dmpGetQuaternion( &q, fifoBuffer );
+
+		gettimeofday( &endc, NULL );
 
 		if( state && !data_ready ) {
 			// gettimeofday( &startt, NULL );
@@ -375,18 +381,7 @@ void loop() {
 			// int descriptor = super_server.get_client_descriptor( 1 );
 
 			// ======= ====== ======= Start of timing block  ======= ====== =======
-			acc.x = ( int16_t ) filter( accX, acc.x );
-			acc.y = ( int16_t ) filter( accY, acc.y );
-			acc.z = ( int16_t ) filter( accZ, acc.z );
 
-			gyr.x = ( int16_t ) filter( gyrX, gyr.x );
-			gyr.y = ( int16_t ) filter( gyrY, gyr.y );
-			gyr.z = ( int16_t ) filter( gyrZ, gyr.z );
-
-			q.w = filter( qW, q.w );
-			q.x = filter( qX, q.x );
-			q.y = filter( qY, q.y );
-			q.z = filter( qZ, q.z );
 			// ======= ====== ======= End of timing block  ======= ====== =======
 
 			gettimeofday( &endt, NULL );
@@ -396,21 +391,22 @@ void loop() {
 			fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
 			fprintf( arq_All, "%ld,%6d,%6d,%6d,%6d,%6d,%6d,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, acc.x, acc.y, acc.z,
 				gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
-			// printf( "Data ready\n" );
-			// data_ready = true;
-			// ActionTracer::ActionDataNetworkPackage *p = super_server.get_packet();
-			proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000000 + ( endt.tv_usec - startt.tv_usec ) ) + 0.5;
 
-			fprintf( arq_Timing, "%ld,%ld\n", mtime, proc_time );
+			// proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000000 + ( endt.tv_usec - startt.tv_usec ) );
+			coll_time =
+				( ( ( endc.tv_sec - startc.tv_sec ) * 1000000 + ( endc.tv_usec - startc.tv_usec ) ) * num_devices );
+
+			fprintf( arq_Timing, "%ld,%ld\n", mtime, coll_time );
 		}
 	}
 }
 
 int main( int argc, char **argv ) {
-	if( argc < 4 ) {
-		printf( "Usage: %s <rate> <filter> <window_size>\n", argv[0] );
-		printf( "Filter: mode median mean\n" );
-		printf( "Window_size: 0 - 1024\n" );
+	if( argc < 3 ) {
+		printf( "Usage: %s <rate> <devices>\n", argv[0] );
+		printf( "devices: number of devices to use\n" );
+		printf( "NB: This requires only one device but will clone the same device multiple times and collect as many "
+				"times as is requested\n" );
 		printf( "Output data rate is calculated as: 200/(rate+1)\n\n" );
 		printf( " Output Rate  |  Rate\n" );
 		printf( "--------------+-------\n" );
@@ -428,35 +424,16 @@ int main( int argc, char **argv ) {
 		return 1;
 	}
 	fifo_rate	= atoi( argv[1] );
-	pack_limit	= ( ( 200 / ( fifo_rate + 1 ) ) * 90 );
-	window_size = atoi( argv[3] );
+	pack_limit	= ( ( 200 / ( fifo_rate + 1 ) ) * 90 ); // 90 seconds data recording
+	num_devices = atoi( argv[2] );
 
 	// convert args to string
-	std::string filter_str = argv[2];
-	std::string window_str = argv[3];
-	std::string bet		   = "_";
+	std::string ar1 = argv[1];
+	std::string ar2 = argv[2];
+	std::string bet = "Hz_";
 
-	test_name = filter_str + bet + window_str;
-
-	if( strcmp( argv[2], "median" ) == 0 ) {
-		filter = &median_filter;
-	} else if( strcmp( argv[2], "mean" ) == 0 ) {
-		filter = &mean_filter;
-	} else if( strcmp( argv[2], "mode" ) == 0 ) {
-		filter = &mode_filter;
-	} else {
-		printf( "Invalid filter mode\n" );
-		return 1;
-	}
+	test_name = std::to_string( ( 200 / ( fifo_rate + 1 ) ) ) + bet + ar2;
 	setup();
-
-	// if( piThreadCreate( send_it ) != 0 ) {
-	// 	printf( "Error creating thread\n" );
-	// 	return 1;
-	// }
-
-	// std::thread( &trans_thread, &data_ready );
-	// printf( "Thread created\n" );
 	while( 1 ) {
 		loop();
 	}
