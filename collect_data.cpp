@@ -80,7 +80,8 @@ long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
 long		   proc_time, blink_time;
 
 std::thread comms;
-uint32_t	packs = 0;
+uint32_t	packs	   = 0;
+uint32_t	pack_limit = 0;
 // ================================================================
 // ===                      INITIAL SETUP                       ===
 // ================================================================
@@ -261,7 +262,7 @@ void blink() {
 // ================================================================
 bool go = false;
 void loop() {
-	if( packs == 18000 ) {
+	if( packs == pack_limit ) {
 		exit( 0 );
 	}
 	gettimeofday( &end, NULL );
@@ -317,11 +318,11 @@ void loop() {
 			stat( existing_dir.c_str(), &atributes );
 			mkdir( new_dir.c_str(), atributes.st_mode );
 
-			std::string Data_Accel		 = namepaste + "/Data_Accel_" + test_name + ".csv",
-						Data_Gyro		 = namepaste + "/Data_Gyro_" + test_name + ".csv",
-						Data_Quaternions = namepaste + "/Data_Quaternions_" + test_name + ".csv",
-						Data_All		 = namepaste + "/Data_All_" + test_name + ".csv",
-						Data_Timing		 = namepaste + "/Data_Timing_" + test_name + ".csv";
+			std::string Data_Accel		 = namepaste + test_name + "/Data_Accel_.csv",
+						Data_Gyro		 = namepaste + test_name + "/Data_Gyro_.csv",
+						Data_Quaternions = namepaste + test_name + "/Data_Quaternions_.csv",
+						Data_All		 = namepaste + test_name + "/Data_All_.csv",
+						Data_Timing		 = namepaste + test_name + "/Data_Timing_.csv";
 
 			arq_Accel = fopen( Data_Accel.c_str(), "wt" );
 			fprintf( arq_Accel, "time,accx,accy,accz\n" );
@@ -427,6 +428,7 @@ int main( int argc, char **argv ) {
 		return 1;
 	}
 	fifo_rate	= atoi( argv[1] );
+	pack_limit	= fifo_rate * 90;
 	window_size = atoi( argv[3] );
 
 	// convert args to string
@@ -434,7 +436,7 @@ int main( int argc, char **argv ) {
 	std::string window_str = argv[3];
 	std::string bet		   = "_";
 
-	test_name = filter_str + bet + window_str;
+	test_name = bet + filter_str + bet + window_str;
 
 	if( strcmp( argv[2], "median" ) == 0 ) {
 		filter = &median_filter;
