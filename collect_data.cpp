@@ -421,7 +421,12 @@ int main( int argc, char **argv ) {
 	fifo_rate	= atoi( argv[1] );
 	window_size = atoi( argv[3] );
 
-	test_name = argv[2] + "_" + argv[3];
+	// convert args to string
+	std::string rate   = argv[1];
+	std::string filter = argv[2];
+	std::string window = argv[3];
+
+	test_name = filter + "_" + window;
 
 	if( strcmp( argv[2], "median" ) == 0 ) {
 		filter = &median_filter;
