@@ -424,8 +424,9 @@ int main( int argc, char **argv ) {
 	// convert args to string
 	std::string filter_str = argv[2];
 	std::string window_str = argv[3];
+	std::string bet		   = "_";
 
-	test_name = filter_type + "_" + window;
+	test_name = filter_str + bet + window_str;
 
 	if( strcmp( argv[2], "median" ) == 0 ) {
 		filter = &median_filter;
