@@ -274,11 +274,13 @@ void loop() {
 	if( go || ( digitalRead( BUTTON ) == true && timestart > 25000 ) ) {
 		gettimeofday( &startb, NULL );
 
-		while( digitalRead( BUTTON ) ) {
+		while( go || digitalRead( BUTTON ) ) {
 			gettimeofday( &endb, NULL );
 			secondsb   = endb.tv_sec - startb.tv_sec;
 			usecondsb  = endb.tv_usec - startb.tv_usec;
 			timestartb = ( ( secondsb ) *1000 + usecondsb / 1000.0 ) + 0.5;
+			delay( 100 );
+			go = false;
 		}
 
 		if( state ) {
