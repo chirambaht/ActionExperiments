@@ -193,6 +193,7 @@ void setup() {
 	pinMode( LED_RED, OUTPUT );
 	pinMode( LED_GREEN, OUTPUT );
 	pinMode( BUTTON, INPUT );
+	pinMode( ACT_DEVICE_4_WIRING_PI_PIN, OUTPUT );
 
 	digitalWrite( LED_RED, HIGH );
 	digitalWrite( LED_GREEN, LOW );
@@ -362,6 +363,8 @@ void loop() {
 			digitalWrite( LED_GREEN, LOW );
 		// read a packet from FIFO
 		gettimeofday( &startcol, NULL );
+
+		digitalWrite( ACT_DEVICE_4_WIRING_PI_PIN, HIGH ); // Simulate activating device 4
 		mpu.getFIFOBytes( fifoBuffer, packetSize );
 		// get the time to create the millis function
 
@@ -372,6 +375,10 @@ void loop() {
 		mpu.dmpGetAccel( &acc, fifoBuffer );
 		mpu.dmpGetGyro( &gyr, fifoBuffer );
 		mpu.dmpGetQuaternion( &q, fifoBuffer );
+
+		float devs[11] = { acc.x, acc.y, acc.z, gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z,
+			mtime };									 // Simulate placing devices in data packet
+		digitalWrite( ACT_DEVICE_4_WIRING_PI_PIN, LOW ); // Simulate deactivating device 4
 
 		gettimeofday( &endcol, NULL );
 
@@ -423,9 +430,10 @@ int main( int argc, char **argv ) {
 
 		return 1;
 	}
-	fifo_rate	= atoi( argv[1] );
-	pack_limit	= ( ( 200 / ( fifo_rate + 1 ) ) * 90 ); // 90 seconds data recording
-	num_devices = atoi( argv[2] );
+	int recording_seconds = 30; // seconds of recording
+	fifo_rate			  = atoi( argv[1] );
+	pack_limit			  = ( ( 200 / ( fifo_rate + 1 ) ) * recording_seconds );
+	num_devices			  = atoi( argv[2] );
 
 	// convert args to string
 	std::string ar1 = argv[1];
