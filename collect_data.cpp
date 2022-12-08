@@ -91,7 +91,7 @@ float median_filter( std::vector<float> &v, float new_value ) {
 	while( v.size() > FILTER_WINDOW_SIZE ) {
 		v.erase( v.begin() );
 	}
-	std::vector<T> v_sorted = v;
+	std::vector<float> v_sorted = v;
 	std::sort( v.begin(), v.end() );
 	return v[v_sorted.size() / 2];
 }
@@ -102,7 +102,7 @@ float mean_filter( std::vector<float> &v, float new_value ) {
 	while( v.size() > FILTER_WINDOW_SIZE ) {
 		v.erase( v.begin() );
 	}
-	T sum = 0;
+	float sum = 0;
 	for( auto &i : v ) {
 		sum += i;
 	}
@@ -115,7 +115,7 @@ float mode_filter( std::vector<float> &v, float new_value ) {
 	while( v.size() > FILTER_WINDOW_SIZE ) {
 		v.erase( v.begin() );
 	}
-	std::vector<T> v_sorted = v;
+	std::vector<float> v_sorted = v;
 	std::sort( v.begin(), v.end() );
 	T	mode		  = v[0];
 	int mode_count	  = 1;
