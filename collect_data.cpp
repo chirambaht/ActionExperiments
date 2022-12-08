@@ -80,7 +80,7 @@ long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
 long		   proc_time, blink_time;
 
 std::thread comms;
-
+uint32_t	packs = 0;
 // ================================================================
 // ===                      INITIAL SETUP                       ===
 // ================================================================
@@ -261,6 +261,9 @@ void blink() {
 // ================================================================
 bool go = false;
 void loop() {
+	if( packs == 18000 ) {
+		exit( 0 );
+	}
 	gettimeofday( &end, NULL );
 	seconds	  = end.tv_sec - start.tv_sec;
 	useconds  = end.tv_usec - start.tv_usec;
@@ -384,6 +387,7 @@ void loop() {
 			// ======= ====== ======= End of timing block  ======= ====== =======
 
 			gettimeofday( &endt, NULL );
+			packs++;
 			fprintf( arq_Accel, "%ld,%6d,%6d,%6d\n", mtime, acc.x, acc.y, acc.z );
 			fprintf( arq_Gyro, "%ld,%6d,%6d,%6d\n", mtime, gyr.x, gyr.y, gyr.z );
 			fprintf( arq_Quaternions, "%ld,%7.5f,%7.5f,%7.5f,%7.5f\n", mtime, q.w, q.x, q.y, q.z );
