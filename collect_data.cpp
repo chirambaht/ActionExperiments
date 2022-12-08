@@ -76,7 +76,7 @@ FILE *arq_Accel, *arq_Gyro, *arq_Quaternions, *arq_All, *arq_Timing;
 
 std::string namepaste = "";
 
-struct timeval start, end, startc, endc, startb, endb, startt, endt, startc, endc;
+struct timeval start, end, startc, endc, startb, endb, startt, endt, startcol, endcol;
 long		   mtime, seconds, useconds, timestart, secondsb, usecondsb, timestartb;
 long		   proc_time, blink_time, coll_time;
 
@@ -361,7 +361,7 @@ void loop() {
 		if( state )
 			digitalWrite( LED_GREEN, LOW );
 		// read a packet from FIFO
-		gettimeofday( &startc, NULL );
+		gettimeofday( &startcol, NULL );
 		mpu.getFIFOBytes( fifoBuffer, packetSize );
 		// get the time to create the millis function
 
@@ -373,7 +373,7 @@ void loop() {
 		mpu.dmpGetGyro( &gyr, fifoBuffer );
 		mpu.dmpGetQuaternion( &q, fifoBuffer );
 
-		gettimeofday( &endc, NULL );
+		gettimeofday( &endcol, NULL );
 
 		if( state && !data_ready ) {
 			// gettimeofday( &startt, NULL );
@@ -393,8 +393,8 @@ void loop() {
 				gyr.x, gyr.y, gyr.z, q.w, q.x, q.y, q.z );
 
 			// proc_time = ( ( endt.tv_sec - startt.tv_sec ) * 1000000 + ( endt.tv_usec - startt.tv_usec ) );
-			coll_time =
-				( ( ( endc.tv_sec - startc.tv_sec ) * 1000000 + ( endc.tv_usec - startc.tv_usec ) ) * num_devices );
+			coll_time = ( ( ( endcol.tv_sec - startcol.tv_sec ) * 1000000 + ( endcol.tv_usec - startcol.tv_usec ) ) *
+				num_devices );
 
 			fprintf( arq_Timing, "%ld,%ld\n", mtime, coll_time );
 		}
