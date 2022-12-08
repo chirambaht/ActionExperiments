@@ -87,6 +87,13 @@ std::thread comms;
 
 // make a generic median filter
 float median_filter( std::vector<float> &v, float new_value ) {
+	// When starting fill the vector with the first value
+	if( v.size() == 0 ) {
+		for( int i = 0; i < FILTER_WINDOW_SIZE; i++ ) {
+			v.push_back( new_value );
+		}
+	}
+
 	v.push_back( new_value );
 	while( v.size() > FILTER_WINDOW_SIZE ) {
 		v.erase( v.begin() );
@@ -98,6 +105,12 @@ float median_filter( std::vector<float> &v, float new_value ) {
 
 // make a generic mean filter
 float mean_filter( std::vector<float> &v, float new_value ) {
+	if( v.size() == 0 ) {
+		for( int i = 0; i < FILTER_WINDOW_SIZE; i++ ) {
+			v.push_back( new_value );
+		}
+	}
+
 	v.push_back( new_value );
 	while( v.size() > FILTER_WINDOW_SIZE ) {
 		v.erase( v.begin() );
@@ -111,6 +124,12 @@ float mean_filter( std::vector<float> &v, float new_value ) {
 
 // make a generic mode filter
 float mode_filter( std::vector<float> &v, float new_value ) {
+	if( v.size() == 0 ) {
+		for( int i = 0; i < FILTER_WINDOW_SIZE; i++ ) {
+			v.push_back( new_value );
+		}
+	}
+
 	v.push_back( new_value );
 	while( v.size() > FILTER_WINDOW_SIZE ) {
 		v.erase( v.begin() );
